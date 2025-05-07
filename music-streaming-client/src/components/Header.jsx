@@ -10,7 +10,8 @@ export default function Header() {
 
   return (
     <>
-      <header className="relative bg-gray-900 text-white px-4 py-6 shadow-md min-h-[140px]">
+      {/* Header sticky */}
+      <header className="sticky top-0 z-50 bg-gray-900 text-white px-4 py-6 shadow-md min-h-[140px]">
         {/* לוגו */}
         <div className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10">
           <img
@@ -55,12 +56,29 @@ export default function Header() {
             </button>
           )}
         </nav>
+      </header>
 
-        {/* תפריט סרגל ראשי במובייל */}
+      {/* חיפוש במובייל - מוצג מתחת להדר */}
+      {mobileSearchOpen && (
+        <div className="sticky top-[140px] z-40 bg-gray-800 w-full px-4 py-3 flex justify-center" dir="rtl">
+          <div className="relative w-full max-w-[300px]">
+            <input
+              type="text"
+              placeholder="חפשו שירים..."
+              className="w-full p-2 pl-10 rounded-md text-black focus:outline-none"
+            />
+            <FontAwesomeIcon
+              icon={faSearch}
+              className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* תפריט סרגל ראשי במובייל */}
+      {menuOpen && (
         <div
-          className={`absolute top-20 right-4 w-48 bg-black text-white shadow-lg rounded-md p-4 z-50 transition-all duration-300 transform origin-top ${
-            menuOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
-          }`}
+          className="sticky top-[140px] z-50 bg-black text-white shadow-lg rounded-md p-4 w-48 mx-4 mt-2 ml-auto"
           dir="rtl"
         >
           <ul className="flex flex-col space-y-2">
@@ -81,35 +99,15 @@ export default function Header() {
             )}
           </ul>
         </div>
+      )}
 
-        {/* חיפוש בדסקטופ */}
-        <div className="hidden md:block absolute right-4 top-16 w-full max-w-[300px] sm:max-w-[300px] z-20" dir="rtl">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="חפשו שירים..."
-              className="w-[170px] sm:w-[200px] md:w-[300px] p-2 pl-10 rounded-md text-black focus:outline-none"
-            />
-            <FontAwesomeIcon
-              icon={faSearch}
-              className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5"
-            />
-          </div>
-        </div>
-      </header>
-
-      {/* חיפוש במובייל */}
-      <div
-        className={`w-full px-4 py-3 bg-gray-800 flex justify-center z-40 transition-all duration-300 transform origin-top ${
-          mobileSearchOpen ? "translate-y-0 opacity-100" : "-translate-y-4 opacity-0 pointer-events-none"
-        }`}
-        dir="rtl"
-      >
-        <div className="relative w-full max-w-[300px]">
+      {/* חיפוש בדסקטופ */}
+      <div className="hidden md:block absolute right-4 top-[150px] w-full max-w-[300px] z-20" dir="rtl">
+        <div className="relative">
           <input
             type="text"
             placeholder="חפשו שירים..."
-            className="w-full p-2 pl-10 rounded-md text-black focus:outline-none"
+            className="w-[170px] sm:w-[200px] md:w-[300px] p-2 pl-10 rounded-md text-black focus:outline-none"
           />
           <FontAwesomeIcon
             icon={faSearch}
