@@ -14,8 +14,8 @@ export default function PlayListCube({ playlists }) {
       <Swiper
         modules={[Navigation, Autoplay]}
         navigation
-        autoplay={{ delay: 1000, disableOnInteraction: false }}
-        loop
+       // autoplay={{ delay: 0, disableOnInteraction: false }}
+        loop : false
         breakpoints={{
           320: { slidesPerView: 2, spaceBetween: 10 },
           640: { slidesPerView: 3, spaceBetween: 20 },

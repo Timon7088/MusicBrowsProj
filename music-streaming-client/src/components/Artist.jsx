@@ -14,8 +14,8 @@ export default function Artist({ artists }) {
       <Swiper
         modules={[Navigation, Autoplay]}
         navigation
-        autoplay={{ delay: 2000, disableOnInteraction: false }}
-        loop
+       // autoplay={{ delay: 0, disableOnInteraction: false }}
+        loop : false
         breakpoints={{
           320: { slidesPerView: 2, spaceBetween: 10 },
           640: { slidesPerView: 3, spaceBetween: 20 },
