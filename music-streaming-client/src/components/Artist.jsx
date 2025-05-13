@@ -1,21 +1,26 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
+import axios from "axios";
 
-export default function Artist({ artists }) {
-  //   if (!Array.isArray(artists)) {
-  //     return null;
-  //   }
+export default function Artist() {
+  const [artists, setArtists] = useState([]);
+  useEffect(() => {
+    axios
+      .get("http://localhost:4000/api/artists")
+      .then((res) => setArtists(res.data))
+      .catch((err) => console.error(err));
+  }, []);
 
   return (
     <div className=" m-auto max-w-7xl my-12">
       <Swiper
         modules={[Navigation, Autoplay]}
         navigation
-       // autoplay={{ delay: 0, disableOnInteraction: false }}
-        loop : false
+        // autoplay={{ delay: 0, disableOnInteraction: false }}
+        loop:false
         breakpoints={{
           320: { slidesPerView: 2, spaceBetween: 10 },
           640: { slidesPerView: 3, spaceBetween: 20 },
