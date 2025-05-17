@@ -1,28 +1,48 @@
-const express = require("express");
-const cors = require("cors");
+import express from "express";
+import cors from "cors";
+import { toNodeHandler } from "better-auth/node";
+import { auth } from "./Auth.js";
+
 const app = express();
-app.use('/songs', express.static('public/songs'));
-app.use('/images', express.static('public/images'));
 const port = 4000;
 
-app.use(cors());
+// הגדרות CORS
+app.use(
+  cors({
+    origin: "http://localhost:5173", // כתובת ה-frontend שלך
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 
+// 👇 חובה לפני better-auth כדי לקרוא את ה-body
+
+
+// 👇 רישום של better-auth (חייב להיות אחרי express.json)
+app.all("/api/auth/*splat", toNodeHandler(auth));
+
+// קבצים סטטיים
+app.use("/songs", express.static("public/songs"));
+app.use("/images", express.static("public/images"));
+
+// מידע על שירים, אמנים ופלייליסטים
 const songs = [
   {
     id: 1,
     title: "Song One",
     artist: "Kendrick lamar",
     cover: "/images/kendrick_dna.jpeg",
-    url: "/songs/DNA-Kendrick-Lamar.mp3"
+    url: "/songs/DNA-Kendrick-Lamar.mp3",
   },
   {
     id: 2,
     title: "Song Two",
     artist: "Artist B",
     cover: "/songs/song2.jpg",
-    url: "/songs/song2.mp3"
-  }
+    url: "/songs/song2.mp3",
+  },
 ];
+
 const playlists = [
   {
     id: 1,
@@ -90,16 +110,23 @@ const artists = [
   },
 ];
 
+// ראוטים להחזרת מידע
 app.get("/api/songs", (req, res) => {
   res.json(songs);
 });
+
 app.get("/api/artists", (req, res) => {
   res.json(artists);
 });
+
 app.get("/api/playlists", (req, res) => {
   res.json(playlists);
 });
 
+
+app.use(express.json());
+
+// הרצת השרת
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });

@@ -2,12 +2,16 @@ import React from "react";
 import PlayListCube from "../components/PlayListCube";
 import Artist from "../components/Artist";
 import SongCarousel from "../components/songsCarousel";
+import { authClient } from "../clients/auth-client";
 
 export default function Home() {
+  const { data } = authClient.useSession();
+  const user = data?.user;
+
   return (
     <div className="min-h-screen bg-black text-white p-4">
       <h1 className="text-4xl font-bold mb-6 text-green-400 text-center">
-        ברוך הבא אורח
+        ברוך הבא {user?.name}!
       </h1>
 
       {/* כותרת לקרוסלת שירים*/}
