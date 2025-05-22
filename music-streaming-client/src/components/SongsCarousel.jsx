@@ -26,9 +26,12 @@ export default function SongCarousel() {
 
   const playSong = (song) => {
     const isCurrent = state.currentSong?.id === song.id;
-    if (!isCurrent) {
-      dispatch({ type: "SET_SONG", payload: song });
+
+    if (isCurrent) {
+      // גם אם זה אותו שיר — תשלח PLAY
+      dispatch({ type: "PLAY" });
     } else {
+      dispatch({ type: "SET_SONG", payload: song });
       dispatch({ type: "PLAY" });
     }
   };

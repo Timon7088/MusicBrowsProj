@@ -42,25 +42,32 @@ const songs = [
 },
 {
   id: 4,
-  title: "Kendrick Lamar DNA",
-  artist: "Kendrick lamar",
-  cover: "/images/kendrick_dna.jpeg",
-  url: "/songs/DNA-Kendrick-Lamar.mp3",
+  title: "Lost",
+  artist: "Linkin Park",
+  cover: "/images/Lost.jpeg",
+  url: "/songs/Lost.mp3",
 },
 {
   id: 5,
-  title: "Avenged-Sevenfold Dear God",
-  artist: "Avenged Sevenfold",
-  cover: "/images/Avenged-Sevenfold-Dear-God.jpeg",
-  url: "/songs/Avenged-Sevenfold-Dear-God.mp3",
+  title: "what i've done",
+  artist: "Linkin Park",
+  cover: "/images/what-ive-done.jpeg",
+  url: "/songs/what-ive-done.mp3",
 },
 {
 id: 6,
-title: "Avenged-Sevenfold Bat Country",
-artist: "Avenged Sevenfold",
-cover: "/images/Avenged-Sevenfold-Bat-Country.jpeg",
-url: "/songs/Avenged-Sevefold-Bat-Country.mp3",
+title: "Highway Star",
+artist: "Deep purple",
+cover: "/images/Highway-Star.jpeg",
+url: "/songs/Highway-Star.mp3",
 },
+{
+  id: 7,
+  title: "November Rain",
+  artist: "Gun n' Roses",
+  cover: "/images/November-Rain.jpg",
+  url: "/songs/November-Rain.mp3",
+  },
 ];
 
 const playlists = [
@@ -120,13 +127,13 @@ const artists = [
   },
   {
     id: 4,
-    name: "Eden hason",
-    imageUrl: "/images/eden-hason.jpg",
+    name: "Guns N' Roses",
+    imageUrl: "/images/guns-and-roses.jpg",
   },
   {
     id: 5,
-    name: "Guns N' Roses",
-    imageUrl: "/images/guns-and-roses.jpg",
+    name: "Deep Purple",
+    imageUrl: "/images/Highway-Star.jpeg",
   },
 ];
 

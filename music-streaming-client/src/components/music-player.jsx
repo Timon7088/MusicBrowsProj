@@ -11,7 +11,7 @@ export default function MusicPlayer() {
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
 
-  // עדכון זמן השיר תוך כדי ניגון
+  // עדכון זמן תוך כדי ניגון
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -29,47 +29,65 @@ export default function MusicPlayer() {
       audio.removeEventListener("timeupdate", updateTime);
       audio.removeEventListener("loadedmetadata", updateTime);
     };
-  }, [volume]);
+  }, [volume, currentSong]);
 
-  // טוען את השיר רק כשיש שינוי ב־currentSong
+  // טוען את השיר בכל שינוי
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !currentSong) return;
     audio.load();
   }, [currentSong]);
 
-  // שולח PLAY באופן אוטומטי כשהשיר מתחלף
-  useEffect(() => {
-    if (!currentSong) return;
-    // dispatch({ type: "PLAY" });
-  }, [currentSong]);
-
-  // מפעיל או עוצר את הנגן בהתאם ל־state
+  // הפעלת שיר כשמוכן
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
+    const handleCanPlay = () => {
+      if (state.isPlaying) {
+        audio.play().catch(() => {
+          dispatch({ type: "PAUSE" });
+        });
+      }
+    };
+
     if (state.isPlaying) {
-      audio.play().catch(() => {
-        dispatch({ type: "PAUSE" });
-      });
+      audio.addEventListener("canplaythrough", handleCanPlay);
     } else {
       audio.pause();
     }
-  }, [state.isPlaying]);
+
+    return () => {
+      audio.removeEventListener("canplaythrough", handleCanPlay);
+    };
+  }, [state.isPlaying, currentSong]);
 
   const togglePlay = async () => {
-    if (!audioRef.current) return;
+    const audio = audioRef.current;
+    if (!audio) return;
+
     try {
       if (state.isPlaying) {
-        audioRef.current.pause();
+        audio.pause();
         dispatch({ type: "PAUSE" });
       } else {
-        await audioRef.current.play();
+        if (audio.readyState < 3) {
+          audio.load();
+          setTimeout(() => {
+            audio
+              .play()
+              .then(() => dispatch({ type: "PLAY" }))
+              .catch(() => dispatch({ type: "PAUSE" }));
+          }, 50);
+          return;
+        }
+
+        await audio.play();
         dispatch({ type: "PLAY" });
       }
     } catch (err) {
       console.error("שגיאה בפעולת ניגון:", err);
+      dispatch({ type: "PAUSE" });
     }
   };
 
@@ -110,9 +128,8 @@ export default function MusicPlayer() {
         <source src={currentSong.url} type="audio/mpeg" />
       </audio>
 
-      {/* שורה עליונה - נייד: סטאק, מחשב: ריווח */}
+      {/* שורת שליטה עליונה */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-6 w-full max-w-6xl mx-auto">
-        {/* שמאל: תמונה + שם שיר + אמן */}
         <div className="flex items-center gap-3 min-w-0">
           <img
             src={currentSong.cover}
@@ -129,7 +146,6 @@ export default function MusicPlayer() {
           </div>
         </div>
 
-        {/* מרכז: כפתורי שליטה */}
         <div className="flex items-center justify-center gap-4">
           <button onClick={() => dispatch({ type: "PREVIOUS_SONG" })}>
             <SkipBack
@@ -154,8 +170,7 @@ export default function MusicPlayer() {
             />
           </button>
         </div>
-
-        {/* ימין: שליטת ווליום */}
+        {/* פס ווליום */}
         <div className="flex items-center gap-2 w-full sm:w-40">
           <Volume2 size={18} className="text-gray-300" />
           <input
@@ -169,7 +184,6 @@ export default function MusicPlayer() {
           />
         </div>
       </div>
-
       {/* פס זמן */}
       <div className="flex items-center gap-3 w-full max-w-6xl mx-auto px-1">
         <span className="text-xs text-gray-400">{formatTime(currentTime)}</span>
