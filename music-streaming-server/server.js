@@ -6,41 +6,61 @@ import { auth } from "./Auth.js";
 const app = express();
 const port = 4000;
 
-// הגדרות CORS
 app.use(
   cors({
-    origin: "http://localhost:5173", // כתובת ה-frontend שלך
+    origin: "http://localhost:5173",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
 );
 
-// 👇 חובה לפני better-auth כדי לקרוא את ה-body
-
-
-// 👇 רישום של better-auth (חייב להיות אחרי express.json)
 app.all("/api/auth/*splat", toNodeHandler(auth));
-
-// קבצים סטטיים
 app.use("/songs", express.static("public/songs"));
 app.use("/images", express.static("public/images"));
 
-// מידע על שירים, אמנים ופלייליסטים
 const songs = [
   {
     id: 1,
-    title: "Song One",
+    title: "Kendrick Lamar DNA",
     artist: "Kendrick lamar",
     cover: "/images/kendrick_dna.jpeg",
     url: "/songs/DNA-Kendrick-Lamar.mp3",
   },
   {
     id: 2,
-    title: "Song Two",
-    artist: "Artist B",
-    cover: "/songs/song2.jpg",
-    url: "/songs/song2.mp3",
+    title: "Avenged-Sevenfold Dear God",
+    artist: "Avenged Sevenfold",
+    cover: "/images/Avenged-Sevenfold-Dear-God.jpeg",
+    url: "/songs/Avenged-Sevenfold-Dear-God.mp3",
   },
+  {
+  id: 3,
+  title: "Avenged-Sevenfold Bat Country",
+  artist: "Avenged Sevenfold",
+  cover: "/images/Avenged-Sevenfold-Bat-Country.jpeg",
+  url: "/songs/Avenged-Sevefold-Bat-Country.mp3",
+},
+{
+  id: 4,
+  title: "Kendrick Lamar DNA",
+  artist: "Kendrick lamar",
+  cover: "/images/kendrick_dna.jpeg",
+  url: "/songs/DNA-Kendrick-Lamar.mp3",
+},
+{
+  id: 5,
+  title: "Avenged-Sevenfold Dear God",
+  artist: "Avenged Sevenfold",
+  cover: "/images/Avenged-Sevenfold-Dear-God.jpeg",
+  url: "/songs/Avenged-Sevenfold-Dear-God.mp3",
+},
+{
+id: 6,
+title: "Avenged-Sevenfold Bat Country",
+artist: "Avenged Sevenfold",
+cover: "/images/Avenged-Sevenfold-Bat-Country.jpeg",
+url: "/songs/Avenged-Sevefold-Bat-Country.mp3",
+},
 ];
 
 const playlists = [
@@ -110,7 +130,6 @@ const artists = [
   },
 ];
 
-// ראוטים להחזרת מידע
 app.get("/api/songs", (req, res) => {
   res.json(songs);
 });

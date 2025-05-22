@@ -30,11 +30,11 @@ export default function PlayListCube() {
       >
         {playlists.map((playlist) => (
           <SwiperSlide key={playlist.id}>
-            <div className="bg-gray-800 rounded-xl overflow-hidden shadow hover:bg-gray-700 transition cursor-pointer h-76">
+            <div className=" h-[350px] bg-gray-800 rounded-xl overflow-hidden shadow hover:bg-gray-700 transition cursor-pointer">
               <img
                 src={playlist.imageUrl}
                 alt={playlist.title}
-                className="w-full h-56 object-cover"
+                className="w-full h-56 object-contain"
               />
               <div className="p-4 h-28">
                 <h2 className="text-xl text-center font-semibold text-green-300 mb-1">
