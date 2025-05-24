@@ -7,11 +7,12 @@ import axios from "axios";
 
 export default function PlayListCube() {
   const [playlists, setPlaylists] = useState([]);
+
   useEffect(() => {
     axios
       .get("http://localhost:4000/api/playlists")
       .then((res) => setPlaylists(res.data))
-      .catch((err) => console.error(err));
+      .catch((err) => console.error("שגיאה בטעינת פלייליסטים:", err));
   }, []);
 
   return (
@@ -19,8 +20,7 @@ export default function PlayListCube() {
       <Swiper
         modules={[Navigation, Autoplay]}
         navigation
-        // autoplay={{ delay: 0, disableOnInteraction: false }}
-        loop:false
+        loop={false} // ✅ תיקון
         breakpoints={{
           320: { slidesPerView: 2, spaceBetween: 10 },
           640: { slidesPerView: 3, spaceBetween: 20 },
@@ -30,7 +30,7 @@ export default function PlayListCube() {
       >
         {playlists.map((playlist) => (
           <SwiperSlide key={playlist.id}>
-            <div className=" h-[350px] bg-gray-800 rounded-xl overflow-hidden shadow hover:bg-gray-700 transition cursor-pointer">
+            <div className="h-[350px] bg-gray-800 rounded-xl overflow-hidden shadow hover:bg-gray-700 transition cursor-pointer">
               <img
                 src={playlist.imageUrl}
                 alt={playlist.title}

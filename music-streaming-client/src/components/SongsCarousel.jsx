@@ -25,10 +25,9 @@ export default function SongCarousel() {
   }, [dispatch, state.queue.length]);
 
   const playSong = (song) => {
-    const isCurrent = state.currentSong?.id === song.id;
+    const isCurrent = state.currentSong?._id === song._id;
 
     if (isCurrent) {
-      // גם אם זה אותו שיר — תשלח PLAY
       dispatch({ type: "PLAY" });
     } else {
       dispatch({ type: "SET_SONG", payload: song });
@@ -37,7 +36,7 @@ export default function SongCarousel() {
   };
 
   return (
-    <div className="p-4 relative">
+    <div className=" mr-auto ml-auto p-4 max-w-7xl relative">
       <h2 className="text-2xl font-semibold mb-6 text-center">
         🎵 שירים מומלצים עבורך
       </h2>
@@ -53,7 +52,7 @@ export default function SongCarousel() {
         className="group"
       >
         {songs.map((song) => (
-          <SwiperSlide key={song.id}>
+          <SwiperSlide key={song._id}>
             <div className="h-[350px] bg-gray-800 rounded-2xl shadow-lg p-4 flex flex-col justify-between items-center transition hover:bg-gray-700 duration-300 cursor-pointer">
               <img
                 src={song.cover}
@@ -64,7 +63,9 @@ export default function SongCarousel() {
                 <h3 className="text-lg font-bold text-green-300 mt-2 truncate">
                   {song.title}
                 </h3>
-                <p className="text-sm text-gray-300 truncate">{song.artist}</p>
+                <p className="text-sm text-gray-300 truncate">
+                  {song.artist?.name || "אמן לא ידוע"}
+                </p>
               </div>
               <button
                 className="mt-2 px-4 py-1 bg-green-600 rounded-full hover:bg-green-500 transition"

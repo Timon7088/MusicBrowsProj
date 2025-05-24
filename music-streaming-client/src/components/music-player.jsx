@@ -7,7 +7,7 @@ export default function MusicPlayer() {
   const { state, dispatch } = useMusicPlayerContext();
   const currentSong = state.currentSong;
 
-  const [volume, setVolume] = useState(1);
+  const [volume, setVolume] = useState(0.2); // ווליום התחלתי
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
 
@@ -31,23 +31,21 @@ export default function MusicPlayer() {
     };
   }, [volume, currentSong]);
 
-  // טוען את השיר בכל שינוי
+  // טוען שיר חדש
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !currentSong) return;
     audio.load();
   }, [currentSong]);
 
-  // הפעלת שיר כשמוכן
+  // הפעלה אוטומטית לפי state
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
     const handleCanPlay = () => {
       if (state.isPlaying) {
-        audio.play().catch(() => {
-          dispatch({ type: "PAUSE" });
-        });
+        audio.play().catch(() => dispatch({ type: "PAUSE" }));
       }
     };
 
@@ -123,14 +121,15 @@ export default function MusicPlayer() {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 w-full bg-black text-white px-4 py-2 flex flex-col gap-2 z-50 shadow-md border-t border-green-500">
+    <div className="fixed bottom-0 left-0 w-full bg-gray-800 text-white px-4 py-2 flex flex-col gap-2 z-50 shadow-md border-t border-green-500">
       <audio ref={audioRef} preload="auto">
         <source src={currentSong.url} type="audio/mpeg" />
       </audio>
 
-      {/* שורת שליטה עליונה */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-6 w-full max-w-6xl mx-auto">
-        <div className="flex items-center gap-3 min-w-0">
+      {/* שורת שליטה עליונה - 3 עמודות */}
+      <div className="grid grid-cols-3 items-center gap-3 sm:gap-6 w-full max-w-6xl mx-auto">
+        {/* פרטי שיר - שמאל */}
+        <div className="flex items-center gap-3 min-w-0 overflow-hidden">
           <img
             src={currentSong.cover}
             alt="cover"
@@ -141,11 +140,12 @@ export default function MusicPlayer() {
               {currentSong.title}
             </p>
             <p className="text-xs text-gray-400 truncate">
-              {currentSong.artist}
+              {currentSong.artist?.name}
             </p>
           </div>
         </div>
 
+        {/* כפתורי ניגון - מרכז */}
         <div className="flex items-center justify-center gap-4">
           <button onClick={() => dispatch({ type: "PREVIOUS_SONG" })}>
             <SkipBack
@@ -170,8 +170,9 @@ export default function MusicPlayer() {
             />
           </button>
         </div>
-        {/* פס ווליום */}
-        <div className="flex items-center gap-2 w-full sm:w-40">
+
+        {/* ווליום - ימין */}
+        <div className="flex items-center gap-2 justify-end w-full sm:w-40">
           <Volume2 size={18} className="text-gray-300" />
           <input
             type="range"
@@ -184,6 +185,7 @@ export default function MusicPlayer() {
           />
         </div>
       </div>
+
       {/* פס זמן */}
       <div className="flex items-center gap-3 w-full max-w-6xl mx-auto px-1">
         <span className="text-xs text-gray-400">{formatTime(currentTime)}</span>

@@ -3,8 +3,6 @@ import PlayListCube from "../components/PlayListCube";
 import Artist from "../components/Artist";
 import SongCarousel from "../components/songsCarousel";
 import { authClient } from "../clients/auth-client";
-import { MusicPlayerProvider } from "../store/musicPlayerContext";
-import MusicPlayer from "../components/music-player";
 
 export default function Home() {
   const { data } = authClient.useSession();

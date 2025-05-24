@@ -17,7 +17,7 @@ export const initialState = {
   
       case "SET_SONG": {
         const index = state.queue.findIndex(
-          (song) => song.id === action.payload.id
+          (song) => song._id === action.payload._id
         );
   
         if (index === -1) return state;

@@ -7,20 +7,20 @@ import axios from "axios";
 
 export default function Artist() {
   const [artists, setArtists] = useState([]);
+
   useEffect(() => {
     axios
       .get("http://localhost:4000/api/artists")
       .then((res) => setArtists(res.data))
-      .catch((err) => console.error(err));
+      .catch((err) => console.error("שגיאה בטעינת אמנים:", err));
   }, []);
 
   return (
-    <div className=" m-auto max-w-7xl my-12">
+    <div className="m-auto max-w-7xl my-12">
       <Swiper
         modules={[Navigation, Autoplay]}
         navigation
-        // autoplay={{ delay: 0, disableOnInteraction: false }}
-        loop:false
+        loop={false}
         breakpoints={{
           320: { slidesPerView: 2, spaceBetween: 10 },
           640: { slidesPerView: 3, spaceBetween: 20 },
@@ -28,10 +28,10 @@ export default function Artist() {
         }}
       >
         {artists.map((artist) => (
-          <SwiperSlide key={artist.id}>
+          <SwiperSlide key={artist._id}>
             <div className="overflow-hidden transition cursor-pointer m-auto flex flex-col items-center w-44 h-56">
               <img
-                src={artist.imageUrl}
+                src={artist.image}
                 alt={artist.name}
                 className="w-40 h-40 rounded-full object-cover mb-2"
               />
