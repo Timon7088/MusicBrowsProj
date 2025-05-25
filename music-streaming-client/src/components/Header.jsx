@@ -48,7 +48,11 @@ export default function Header() {
 
         {user && (
           <>
-            <Link to="/profile" className="hover:text-green-300" viewTransition>
+            <Link
+              to="/userProfile"
+              className="hover:text-green-300"
+              viewTransition
+            >
               האזור האישי
             </Link>
             <button onClick={handleLogout} className="hover:text-green-400">
@@ -109,7 +113,7 @@ export default function Header() {
             {user && (
               <>
                 <li>
-                  <Link to="/profile" onClick={() => setMenuOpen(false)}>
+                  <Link to="/userProfile" onClick={() => setMenuOpen(false)}>
                     האזור האישי
                   </Link>
                 </li>

@@ -5,6 +5,7 @@ import About from "./pages/About";
 import Contact from "./pages/contact";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
+import UserProfile from "./pages/userProfile";
 import { MusicPlayerProvider } from "./store/musicPlayerContext";
 import MusicPlayer from "./components/music-player";
 
@@ -22,10 +23,11 @@ export default function App() {
               <Route path="/Contact" element={<Contact />} />
               <Route path="/Register" element={<Register />} />
               <Route path="/Login" element={<Login />} />
+              <Route path="/userProfile" element={<UserProfile />} />
             </Routes>
           </main>
 
-          {/* ⬇️ נגן קבוע בתחתית העמוד */}
+          {/* נגן קבוע בתחתית העמוד */}
           <MusicPlayer />
         </div>
       </Router>
