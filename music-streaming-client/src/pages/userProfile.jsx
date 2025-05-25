@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Play } from "lucide-react";
+import { Play, Trash } from "lucide-react";
 import { useMusicPlayerContext } from "../store/musicPlayerContext";
 import { authClient } from "../clients/auth-client";
 
@@ -30,7 +30,18 @@ export default function UserProfile() {
     dispatch({ type: "PLAY" });
   };
 
-  const clearFavorites = async () => {
+  const clearSong = async (songId) => { // מחיקת שיר בודדת על ידי אייקון פח
+    try {
+      const updatedLikedSongs = user.likedSongs.filter((id) => id !== songId);
+      await authClient.updateUser({ likedSongs: updatedLikedSongs });
+      setLikedSongs((prev) => prev.filter((song) => song._id !== songId));
+    } catch (err) {
+      console.error("שגיאה במחיקת שיר מהאהובים:", err);
+      alert("אירעה שגיאה בעת הסרת השיר.");
+    }
+  };
+
+  const clearFavorites = async () => { // כפתור מחיקה של כל השירים מאיזור הלקוח
     try {
       await authClient.updateUser({ likedSongs: [] });
       setLikedSongs([]);
@@ -69,8 +80,9 @@ export default function UserProfile() {
                   <th className="py-2 px-4">שיר</th>
                   <th className="py-2 px-4">אמן</th>
                   <th className="py-2 px-4">נוסף בתאריך</th>
-                  <th className="py-2 px-4">⏱</th>
+                  <th className="py-2 px-4">זמן</th>
                   <th className="py-2 px-4">נגן</th>
+                  <th className="py-2 px-4">מחיקה</th>
                 </tr>
               </thead>
               <tbody>
@@ -85,9 +97,6 @@ export default function UserProfile() {
                       />
                       <div className="text-right">
                         <p className="text-white font-semibold">{song.title}</p>
-                        <p className="text-sm text-gray-400">
-                          {song.album || "אלבום לא ידוע"}
-                        </p>
                       </div>
                     </td>
                     <td className="py-3 px-4 text-gray-300">
@@ -108,6 +117,15 @@ export default function UserProfile() {
                         <Play size={18} className="fill-black" />
                       </button>
                     </td>
+                    <td className="py-3 px-4">
+                      <button
+                        onClick={() => clearSong(song._id)}
+                        className=" hover:bg-red-600 text-white rounded-full p-2"
+                        title="מחק שיר"
+                      >
+                        <Trash size={18} />
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -115,15 +133,16 @@ export default function UserProfile() {
           </div>
         )}
       </div>
-
+        <div className=" text-center">
       {likedSongs.length > 0 && (
         <button
           onClick={clearFavorites}
           className="bg-red-600 text-white px-5 py-2 rounded hover:bg-red-500 transition"
         >
-          נקה את רשימת האהובים
+          ניקוי כל השירים
         </button>
       )}
+      </div>
     </div>
   );
 }

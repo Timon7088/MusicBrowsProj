@@ -172,7 +172,7 @@ export default function MusicPlayer() {
         </div>
 
         {/* ווליום - ימין */}
-        <div className="flex items-center gap-2 justify-end w-full sm:w-40">
+        <div className="flex gap-2 items-center justify-end w-full sm:w-40">
           <Volume2 size={18} className="text-gray-300" />
           <input
             type="range"
