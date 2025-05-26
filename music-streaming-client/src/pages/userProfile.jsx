@@ -14,21 +14,21 @@ export default function UserProfile() {
     axios
       .get("http://localhost:4000/api/songs")
       .then((res) => {
-        const userLikedSongs = res.data
-          .filter((song) => user.likedSongs.includes(song._id))
-          .map((song) => ({
-            ...song,
-            addedAt: song.addedAt || new Date().toISOString(),
-          }));
+        const userLikedSongs = user.likedSongs
+          .map((likedSong) => {
+            const findLikedSongs = res.data.find((song) => likedSong  === song._id)
+            return {...findLikedSongs, addedAt: likedSong.addedAt || new Date().toISOString(),}
+          });
         setLikedSongs(userLikedSongs);
       })
       .catch((err) => console.error("שגיאה בשליפת שירים:", err));
   }, [user.likedSongs]);
 
-  const playSong = (song) => {
-    dispatch({ type: "SET_SONG", payload: song });
-    dispatch({ type: "PLAY" });
-  };
+const playSong = (song) => {
+  dispatch({ type: "SET_QUEUE", payload: likedSongs });
+  dispatch({ type: "SET_SONG", payload: song });
+  dispatch({ type: "PLAY" });
+};
 
   const clearSong = async (songId) => { // מחיקת שיר בודדת על ידי אייקון פח
     try {

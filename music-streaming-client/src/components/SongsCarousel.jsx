@@ -35,6 +35,7 @@ export default function SongCarousel() {
     if (isCurrent) {
       dispatch({ type: "PLAY" });
     } else {
+      dispatch({type: "SET_QUEUE", payload: songs });
       dispatch({ type: "SET_SONG", payload: song });
       dispatch({ type: "PLAY" });
     }

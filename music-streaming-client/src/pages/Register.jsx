@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { authClient } from "../clients/auth-client";
+import { useNavigate } from "react-router";
 
 export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,12 +17,17 @@ export default function Register() {
       name,
     });
   };
+      if (res?.session)
+        navigate("/");
+         else 
+        console.error("ההרשמה הצליחה אך אין session");
+      
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white">
       <h1 className="text-4xl font-bold text-green-400 mb-4">הרשמה</h1>
       <p className="max-w-xl text-center text-gray-300 mb-6">
-        מלא את פרטיך כדי להירשם לאתר ולהתחיל להאזין למוזיקה 🎶
+        מלא את פרטיך כדי להירשם לאתר ולהתחיל להאזין למוזיקה
       </p>
       <form
         onSubmit={handleSubmit}
