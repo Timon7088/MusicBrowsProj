@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Play, Trash } from "lucide-react";
+import { Play, Trash, Pause } from "lucide-react";
 import { useMusicPlayerContext } from "../store/musicPlayerContext";
 import { authClient } from "../clients/auth-client";
 
@@ -8,29 +8,43 @@ export default function UserProfile() {
   const { data } = authClient.useSession();
   const user = data.user;
   const [likedSongs, setLikedSongs] = useState([]);
-  const { dispatch } = useMusicPlayerContext();
+  const { state, dispatch } = useMusicPlayerContext();
 
   useEffect(() => {
     axios
       .get("http://localhost:4000/api/songs")
       .then((res) => {
-        const userLikedSongs = user.likedSongs
-          .map((likedSong) => {
-            const findLikedSongs = res.data.find((song) => likedSong  === song._id)
-            return {...findLikedSongs, addedAt: likedSong.addedAt || new Date().toISOString(),}
-          });
+        const userLikedSongs = user.likedSongs.map((likedSong) => {
+          const findLikedSongs = res.data.find(
+            (song) => likedSong === song._id
+          );
+          return {
+            ...findLikedSongs,
+            addedAt: likedSong.addedAt || new Date().toISOString(),
+          };
+        });
         setLikedSongs(userLikedSongs);
       })
       .catch((err) => console.error("שגיאה בשליפת שירים:", err));
   }, [user.likedSongs]);
 
-const playSong = (song) => {
-  dispatch({ type: "SET_QUEUE", payload: likedSongs });
-  dispatch({ type: "SET_SONG", payload: song });
-  dispatch({ type: "PLAY" });
-};
+  const togglePlay = (song) => {
+    const isCurrent = state.currentSong?._id === song._id;
+    if (isCurrent) {
+      if (state.isPlaying) {
+        dispatch({ type: "PAUSE" });
+      } else {
+        dispatch({ type: "PLAY" });
+      }
+    } else {
+      dispatch({ type: "SET_QUEUE", payload: likedSongs });
+      dispatch({ type: "SET_SONG", payload: song });
+      dispatch({ type: "PLAY" });
+    }
+  };
 
-  const clearSong = async (songId) => { // מחיקת שיר בודדת על ידי אייקון פח
+  const clearSong = async (songId) => {
+    // מחיקת שיר בודדת על ידי אייקון פח
     try {
       const updatedLikedSongs = user.likedSongs.filter((id) => id !== songId);
       await authClient.updateUser({ likedSongs: updatedLikedSongs });
@@ -41,7 +55,8 @@ const playSong = (song) => {
     }
   };
 
-  const clearFavorites = async () => { // כפתור מחיקה של כל השירים מאיזור הלקוח
+  const clearFavorites = async () => {
+    // כפתור מחיקה של כל השירים מאיזור הלקוח
     try {
       await authClient.updateUser({ likedSongs: [] });
       setLikedSongs([]);
@@ -110,11 +125,26 @@ const playSong = (song) => {
                     </td>
                     <td className="py-3 px-4">
                       <button
-                        onClick={() => playSong(song)}
-                        className="bg-green-500 hover:bg-green-400 text-black rounded-full p-2"
-                        title="נגן שיר"
+                        onClick={() => togglePlay(song)}
+                        className="bg-green-500 text-white rounded-full p-2 hover:bg-green-400 transition"
+                        title={
+                          state.currentSong?._id === song._id && state.isPlaying
+                            ? "השהה שיר"
+                            : "נגן שיר"
+                        }
                       >
-                        <Play size={18} className="fill-black" />
+                        {state.currentSong?._id === song._id &&
+                        state.isPlaying ? (
+                          <Pause
+                            size={18}
+                            className="text-gray-900 fill-gray-900"
+                          />
+                        ) : (
+                          <Play
+                            size={18}
+                            className="text-gray-900 fill-gray-900"
+                          />
+                        )}
                       </button>
                     </td>
                     <td className="py-3 px-4">
@@ -133,15 +163,15 @@ const playSong = (song) => {
           </div>
         )}
       </div>
-        <div className=" text-center">
-      {likedSongs.length > 0 && (
-        <button
-          onClick={clearFavorites}
-          className="bg-red-600 text-white px-5 py-2 rounded hover:bg-red-500 transition"
-        >
-          ניקוי כל השירים
-        </button>
-      )}
+      <div className=" text-center">
+        {likedSongs.length > 0 && (
+          <button
+            onClick={clearFavorites}
+            className="bg-red-600 text-white px-5 py-2 rounded hover:bg-red-500 transition"
+          >
+            ניקוי כל השירים
+          </button>
+        )}
       </div>
     </div>
   );

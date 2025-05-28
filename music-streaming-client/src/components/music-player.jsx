@@ -1,6 +1,13 @@
 import { useRef, useEffect, useState } from "react";
 import { useMusicPlayerContext } from "../store/musicPlayerContext";
-import { Play, Pause, SkipForward, SkipBack, Volume2 } from "lucide-react";
+import {
+  Play,
+  Pause,
+  SkipForward,
+  SkipBack,
+  Volume2,
+  Shuffle,
+} from "lucide-react";
 
 export default function MusicPlayer() {
   const audioRef = useRef(null);
@@ -43,21 +50,11 @@ export default function MusicPlayer() {
     const audio = audioRef.current;
     if (!audio) return;
 
-    const handleCanPlay = () => {
-      if (state.isPlaying) {
-        audio.play().catch(() => dispatch({ type: "PAUSE" }));
-      }
-    };
-
     if (state.isPlaying) {
-      audio.addEventListener("canplaythrough", handleCanPlay);
+      audio.play().catch(() => dispatch({ type: "PAUSE" }));
     } else {
       audio.pause();
     }
-
-    return () => {
-      audio.removeEventListener("canplaythrough", handleCanPlay);
-    };
   }, [state.isPlaying, currentSong]);
 
   const togglePlay = async () => {
@@ -66,21 +63,15 @@ export default function MusicPlayer() {
 
     try {
       if (state.isPlaying) {
-        audio.pause();
         dispatch({ type: "PAUSE" });
       } else {
         if (audio.readyState < 3) {
           audio.load();
           setTimeout(() => {
-            audio
-              .play()
-              .then(() => dispatch({ type: "PLAY" }))
-              .catch(() => dispatch({ type: "PAUSE" }));
+            dispatch({ type: "PLAY" });
           }, 50);
           return;
         }
-
-        await audio.play();
         dispatch({ type: "PLAY" });
       }
     } catch (err) {
@@ -168,6 +159,17 @@ export default function MusicPlayer() {
               size={20}
               className="text-green-500 hover:text-green-400 transition"
             />
+          </button>
+          <button
+            onClick={() => dispatch({ type: "TOGGLE_SHUFFLE" })}
+            className={`transition ${
+              state.isShuffled
+                ? "text-green-500 hover:text-green-400"
+                : "text-white-900 hover:text-gray-600"
+            }`}
+            title={state.isShuffled ? "Shuffle פעיל" : "הפעל Shuffle"}
+          >
+            <Shuffle size={20} />
           </button>
         </div>
 

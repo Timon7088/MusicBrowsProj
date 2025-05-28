@@ -64,7 +64,21 @@ export const initialState = {
           isPlaying: true,
         };
       }
-  
+
+      case "TOGGLE_SHUFFLE": {
+        const shuffleSongs = [...state.queue];
+        if(!state.isShuffled) {
+          for (let i = shuffleSongs.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffleSongs[i], shuffleSongs[j]] = [shuffleSongs[j], shuffleSongs[i]];
+          }
+        }
+        return{
+          ...state, queue: shuffleSongs,
+          isShuffled: !state.isShuffled,
+        };
+      }
+
       default:
         return state;
     }

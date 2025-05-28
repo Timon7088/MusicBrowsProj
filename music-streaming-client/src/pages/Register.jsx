@@ -17,11 +17,8 @@ export default function Register() {
       name,
     });
   };
-      if (res?.session)
-        navigate("/");
-         else 
-        console.error("ההרשמה הצליחה אך אין session");
-      
+  if (res?.session) navigate("/");
+  else console.error("ההרשמה הצליחה אך אין session");
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white">
