@@ -21,27 +21,18 @@ export default function Register() {
       });
 
       console.log("תוצאת ההרשמה:", res);
+      if (res?.error) throw res.error;
 
       if (res?.data?.user) {
         navigate("/");
       } else {
-        setErrorMessage("ההרשמה נכשלה – נסה שוב.");
+        setErrorMessage("ההרשמה נכשלה-נסה שוב.");
       }
     } catch (err) {
-      console.error("שגיאה בהרשמה:", err);
+      // const msgLower = serverMsg.toLowerCase();
 
-      const serverMsg =
-        err?.response?.data?.error?.message || err?.message || "";
-
-      if (
-        err.response?.status === 422 ||
-        serverMsg.toLowerCase().includes("email") ||
-        serverMsg.toLowerCase().includes("username") ||
-        serverMsg.toLowerCase().includes("already exists")
-      ) {
-        setErrorMessage("⚠️ האימייל או שם המשתמש כבר קיימים במערכת. נסה פרטים אחרים.");
-      } else {
-        setErrorMessage("🚫 אירעה שגיאה בלתי צפויה – נסה שוב.");
+      if (err?.status === 422) {
+        setErrorMessage("האימייל הזה כבר קיים במערכת, נסה מייל אחר.");
       }
     }
   };
@@ -64,7 +55,10 @@ export default function Register() {
         className="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md"
       >
         <div className="mb-4">
-          <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-300 mb-2"
+          >
             אימייל
           </label>
           <input
@@ -78,7 +72,10 @@ export default function Register() {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-300 mb-2"
+          >
             שם משתמש
           </label>
           <input
@@ -92,7 +89,10 @@ export default function Register() {
         </div>
 
         <div className="mb-6">
-          <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-gray-300 mb-2"
+          >
             סיסמה
           </label>
           <input
