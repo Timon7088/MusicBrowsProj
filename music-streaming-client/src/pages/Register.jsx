@@ -6,35 +6,65 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission logic here
-    const res = await authClient.signUp.email({
-      email,
-      password,
-      name,
-    });
+    setErrorMessage("");
+
+    try {
+      const res = await authClient.signUp.email({
+        email,
+        password,
+        name,
+      });
+
+      console.log("תוצאת ההרשמה:", res);
+
+      if (res?.data?.user) {
+        navigate("/");
+      } else {
+        setErrorMessage("ההרשמה נכשלה – נסה שוב.");
+      }
+    } catch (err) {
+      console.error("שגיאה בהרשמה:", err);
+
+      const serverMsg =
+        err?.response?.data?.error?.message || err?.message || "";
+
+      if (
+        err.response?.status === 422 ||
+        serverMsg.toLowerCase().includes("email") ||
+        serverMsg.toLowerCase().includes("username") ||
+        serverMsg.toLowerCase().includes("already exists")
+      ) {
+        setErrorMessage("⚠️ האימייל או שם המשתמש כבר קיימים במערכת. נסה פרטים אחרים.");
+      } else {
+        setErrorMessage("🚫 אירעה שגיאה בלתי צפויה – נסה שוב.");
+      }
+    }
   };
-  if (res?.session) navigate("/");
-  else console.error("ההרשמה הצליחה אך אין session");
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white px-4">
       <h1 className="text-4xl font-bold text-green-400 mb-4">הרשמה</h1>
-      <p className="max-w-xl text-center text-gray-300 mb-6">
+      <p className="max-w-xl text-center text-gray-300 mb-4">
         מלא את פרטיך כדי להירשם לאתר ולהתחיל להאזין למוזיקה
       </p>
+
+      {errorMessage && (
+        <div className="w-full max-w-md bg-red-600 text-white px-4 py-3 rounded mb-6 text-center font-medium shadow-md">
+          {errorMessage}
+        </div>
+      )}
+
       <form
         onSubmit={handleSubmit}
         className="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md"
       >
         <div className="mb-4">
-          <label
-            htmlFor="email"
-            className="block text-sm font-medium text-gray-300 mb-2"
-          >
+          <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
             אימייל
           </label>
           <input
@@ -46,11 +76,9 @@ export default function Register() {
             className="w-full p-3 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
           />
         </div>
+
         <div className="mb-4">
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium text-gray-300 mb-2"
-          >
+          <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
             שם משתמש
           </label>
           <input
@@ -62,11 +90,9 @@ export default function Register() {
             className="w-full p-3 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
           />
         </div>
+
         <div className="mb-6">
-          <label
-            htmlFor="password"
-            className="block text-sm font-medium text-gray-300 mb-2"
-          >
+          <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
             סיסמה
           </label>
           <input
@@ -78,6 +104,7 @@ export default function Register() {
             className="w-full p-3 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
           />
         </div>
+
         <button
           type="submit"
           className="w-full py-3 bg-green-400 text-black font-bold rounded hover:bg-green-500 transition"
