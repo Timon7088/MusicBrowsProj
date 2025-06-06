@@ -10,12 +10,12 @@ await mongoose.connect("mongodb://localhost:27017/musicbrows", {
 console.log("Seeding in to the Data Base");
 
 const artistData = [
-  { name: "Kendrick Lamar", image: "/images/Kendrick-Lamar.jpg" },
-  { name: "Avenged Sevenfold", image: "/images/avenged-sevenfold1.webp" },
-  { name: "Linkin Park", image: "/images/linkin-park.jpeg" },
-  { name: "Guns N' Roses", image: "/images/guns-and-roses.jpg" },
-  { name: "Deep Purple", image: "/images/Highway-Star.jpeg" },
-  { name: "Kansas", image: "/images/Carry-on-my-wayward-son.jpeg" },
+  { name: "Kendrick Lamar", bio: "קנדריק לאמאר (Kendrick Lamar) הוא ראפר, פזמונאי ומפיק אמריקאי, יליד קליפורניה (1987), הנחשב לאחד האמנים המשפיעים והמהוללים ביותר בדורו. הוא פרץ לתודעה עם האלבום good kid, m.A.A.d city (2012), שזכה לשבחים בזכות סיפורו האישי והליריקה החדה. בהמשך הוציא את To Pimp a Butterfly ו־DAMN., האלבום שהביא לו פרס פוליצר – ציון דרך חסר תקדים בעולם ההיפ-הופ. סגנונו משלב היפ-הופ, ג'אז, פאנק ופוליטיקה חברתית. לאמאר ידוע במסרים החזקים ביצירותיו, בהתעמקות בזהות שחורה, צדק חברתי ומאבקים פנימיים.", image: "/images/Kendrick-Lamar.jpg" },
+  { name: "Avenged Sevenfold", bio: "להקת Avenged Sevenfold (או בקיצור A7X) היא להקת הארד רוק ומטאל מלודיק אמריקאית שהוקמה בשנת 1999 מקליפורניה. הלהקה מזוהה בסגנון מטאלקור בתחילת דרכה, ובהמשך עברה לסגנון רוק כבד/הבי מטאל עם השפעות סימפוניות ופרוגרסיביות. חברי הלהקה כוללים את M. Shadows (שירה), Synyster Gates (גיטרה מובילה), Zacky Vengeance (גיטרה קצב), Johnny Christ (בס) והמתופף הנוכחי Brooks Wackerman. אלבומיהם המובילים כוללים את City of Evil, Avenged Sevenfold, ו־Nightmare, שזכה להצלחה מסחרית רבה. המוזיקה של הלהקה נודעת במלודיות מורכבות, קטעי סולו מרהיבים, וטקסטים נרטיביים עוצמתיים. A7X נחשבת לאחת הלהקות החשובות בגל המטאל האמריקאי של שנות ה־2000.", image: "/images/avenged-sevenfold1.webp" },
+  { name: "Linkin Park", bio: "Linkin Park היא להקת נו־מטאל/רוק אלטרנטיבי אמריקאית שהוקמה בקליפורניה בשנת 1996. הלהקה פרצה לתודעה עם אלבום הבכורה האיקוני Hybrid Theory (2000), שכלל להיטים כמו “In the End” ו־“Crawling”. סגנונם הייחודי משלב ראפ, מטאל, אלקטרוניקה ומלודיות רוק. חברים מרכזיים בלהקה כוללים את צ'סטר בנינגטון (שירה ראשית, שנפטר ב־2017), מייק שינודה (ראפ/קלידים/גיטרה), ובראד דלסון (גיטרה). הלהקה נגעה בנושאים של כאב נפשי, זהות וקונפליקט פנימי, וזכתה לפופולריות עולמית עצומה. הם ממשיכים להשפיע על דורות של מוזיקאים ברחבי העולם.", image: "/images/linkin-park.jpeg" },
+  { name: "Guns N' Roses", bio: "Guns N' Roses היא להקת רוק אמריקאית אגדית שהוקמה בלוס אנג'לס בשנת 1985. הלהקה זכתה לפרסום עולמי בזכות הסגנון החצוף והאנרגטי שלה, המשלב הארד רוק, בלוז ורוקנרול קלאסי. אלבום הבכורה Appetite for Destruction (1987) נחשב לאחד האלבומים הנמכרים ביותר בהיסטוריה, עם להיטים כמו “Sweet Child O’ Mine”, “Welcome to the Jungle” ו־“Paradise City”. סולן הלהקה אקסל רוז וגיטריסט העל סלאש הפכו לדמויות איקוניות ברוק העולמי. לאחר שנים של הפסקות ומתח בין חברים, הלהקה התאחדה והמשיכה להופיע ולרגש קהלים ברחבי העולם.", image: "/images/guns-and-roses.jpg" },
+  { name: "Deep Purple", bio: "Deep Purple היא להקת רוק בריטית שהוקמה בשנת 1968 ונחשבת לאחת מאבני היסוד של ההארד רוק וההבי מטאל. סגנונה משלב רוק כבד עם השפעות קלאסיות ובלוז. חברי ההרכב הקלאסי כוללים את איאן גילן (שירה), ריצ'י בלאקמור (גיטרה), ג'ון לורד (קלידים), רוג'ר גלובר (בס) ואיאן פייס (תופים). בין להיטיה הבולטים: ''Smoke on the Water'', ''Highway Star'' ו־''Child in Time''. הלהקה ידועה בנגינה טכנית מרשימה ובהופעות חיות עוצמתיות, והמשיכה להשפיע על דורות של מוזיקאים גם בשנות ה־2000 והלאה.", image: "/images/Highway-Star.jpeg" },
+  { name: "Kansas", bio: "Kansas היא להקת רוק פרוגרסיבי אמריקאית שהוקמה בתחילת שנות ה־70 במדינת קנזס. הלהקה שילבה בין רוק קלאסי, אלמנטים סימפוניים וטכניקה מוזיקלית גבוהה. היא נודעת בזכות להיטים על־זמניים כמו ''Carry On Wayward Son'' ו־''Dust in the Wind'', שהפכו לסמלים של הרוק האמריקאי. הסאונד של קנזס מאופיין בשילוב ייחודי של כינור, קלידים וגיטרות חשמליות, עם טקסטים פילוסופיים ורוחניים. הלהקה ממשיכה להופיע עד היום בהרכבים שונים, ומחזיקה מקום מיוחד בזיכרון הקולקטיבי של הרוק המתקדם האמריקאי.", image: "/images/Carry-on-my-wayward-son.jpeg" },
 ];
 
 for (const artist of artistData) {
@@ -192,6 +192,18 @@ for (const song of songData) {
     { title: song.title },
     { $set: song },
     { upsert: true }
+  );
+}
+
+console.log("Linking songs to artists...");
+
+for (const artist of artistsFromDB) {
+  const songsForArtist = await Song.find({ artist: artist._id });
+  const songIds = songsForArtist.map((s) => s._id);
+
+  await Artist.updateOne(
+    { _id: artist._id },
+    { $set: { songs: songIds, updatedAt: new Date() } }
   );
 }
 

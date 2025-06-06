@@ -20,11 +20,11 @@ export default function Home() {
       </h2>
       <SongCarousel />
 
-      {/* כותרת פלייליסטים */}
+      {/* כותרת פלייליסטים
       <h2 className="mt-5 text-3xl font-bold mb-4 text-white text-center">
         פלייליסטים מוכנים
       </h2>
-      <PlayListCube />
+      <PlayListCube /> */}
 
       {/* כותרת אמנים */}
       <h2 className="mt-5 text-3xl font-bold mb-4 text-white text-center">

@@ -7,6 +7,7 @@ import Contact from "./pages/contact";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import UserProfile from "./pages/userProfile";
+import ArtistPage from "./pages/ArtistPage";
 import { MusicPlayerProvider } from "./store/musicPlayerContext";
 import MusicPlayer from "./components/music-player";
 
@@ -26,6 +27,7 @@ export default function App() {
               <Route path="/Register" element={<Register />} />
               <Route path="/Login" element={<Login />} />
               <Route path="/userProfile" element={<UserProfile />} />
+              <Route path="/artist/:id" element={<ArtistPage />} />
             </Routes>
           </main>
 

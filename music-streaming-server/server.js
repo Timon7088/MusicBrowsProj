@@ -40,38 +40,38 @@ app.use("/api/songs", songRoutes);
 app.use("/api/artists", artistRoutes);
 
 // פלייליסטים מדומים זמניים
-const playlists = [
-  {
-    id: 1,
-    title: "הלהיטים של 2025",
-    description: "השירים הכי חמים של השנה",
-    imageUrl: "/images/2025-hiphop-hits.jpeg"
-  },
-  {
-    id: 2,
-    title: "מוזיקת צ'יל",
-    description: "רוגע, קפה ושקיעה",
-    imageUrl: "/images/chill-Music.jpeg"
-  },
-  {
-    id: 3,
-    title: "ראפ שכולם אוהבים",
-    description: "שהשכונה קשה האיכות גבוהה",
-    imageUrl: "/images/Rap-Music.jpg"
-  },
-  {
-    id: 4,
-    title: "להיטי רוק",
-    description: "מיטב הלהיטים של רוק קלאסי ומודרני",
-    imageUrl: "/images/classic-rock-hits.jpg"
-  },
-  {
-    id: 5,
-    title: "להיטי רוק",
-    description: "מיטב הלהיטים של רוק קלאסי ומודרני",
-    imageUrl: "/images/classic-rock-hits.jpg"
-  }
-];
+// const playlists = [
+//   {
+//     id: 1,
+//     title: "הלהיטים של 2025",
+//     description: "השירים הכי חמים של השנה",
+//     imageUrl: "/images/2025-hiphop-hits.jpeg"
+//   },
+//   {
+//     id: 2,
+//     title: "מוזיקת צ'יל",
+//     description: "רוגע, קפה ושקיעה",
+//     imageUrl: "/images/chill-Music.jpeg"
+//   },
+//   {
+//     id: 3,
+//     title: "ראפ שכולם אוהבים",
+//     description: "שהשכונה קשה האיכות גבוהה",
+//     imageUrl: "/images/Rap-Music.jpg"
+//   },
+//   {
+//     id: 4,
+//     title: "להיטי רוק",
+//     description: "מיטב הלהיטים של רוק קלאסי ומודרני",
+//     imageUrl: "/images/classic-rock-hits.jpg"
+//   },
+//   {
+//     id: 5,
+//     title: "להיטי רוק",
+//     description: "מיטב הלהיטים של רוק קלאסי ומודרני",
+//     imageUrl: "/images/classic-rock-hits.jpg"
+//   }
+// ];
 
 app.get("/api/playlists", (req, res) => {
   res.json(playlists);

@@ -89,7 +89,7 @@ export default function SongCarousel() {
               {user && (
                 <button
                   onClick={() => addToFavorites(song._id)}
-                  className="absolute top-2 right-2 text-green-500 hover:text-green-300 z-10"
+                  className="absolute top-2 right-2 text-green-500 hover:text-green-300 z-10 transition"
                   title="הוסף לרשימת אהובים"
                 >
                   <Heart

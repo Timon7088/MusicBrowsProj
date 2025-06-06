@@ -45,26 +45,22 @@ export default function UserProfile() {
   };
 
   const clearSong = async (songId) => {
-    // מחיקת שיר בודדת על ידי אייקון פח + הוספת הודעות של הסרת שירים מוצלחת
     try {
       const updatedLikedSongs = user.likedSongs.filter((id) => id !== songId);
       await authClient.updateUser({ likedSongs: updatedLikedSongs });
       setLikedSongs((prev) => prev.filter((song) => song._id !== songId));
       toast.success("השיר הוסר מרשימת האהובים שלך!");
     } catch (err) {
-      //console.error("שגיאה במחיקת שיר מהאהובים:", err);
       toast.error("אירעה שגיאה בעת הסרת השיר.");
     }
   };
 
   const clearFavorites = async () => {
-    // כפתור מחיקה של כל השירים מאיזור הלקוח + הוספת הודעה להסרת כל השירים
     try {
       await authClient.updateUser({ likedSongs: [] });
       setLikedSongs([]);
       toast.success("רשימת האהובים שלך פונתה בהצלחה!");
     } catch (err) {
-      //console.error("שגיאה בפינוי רשימת האהובים:", err);
       toast.error("שגיאה בפינוי רשימת האהובים");
     }
   };
@@ -76,7 +72,7 @@ export default function UserProfile() {
 
   return (
     <div
-      className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white px-6 py-10"
+      className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white px-4 py-10"
       dir="rtl"
     >
       <h1 className="text-4xl font-bold text-green-400 mb-6">
@@ -93,13 +89,15 @@ export default function UserProfile() {
             <table className="w-full text-right border-collapse">
               <thead className="border-b border-gray-700 text-gray-400 text-sm">
                 <tr>
-                  <th className="py-2 px-4">#</th>
-                  <th className="py-2 px-4">שיר</th>
-                  <th className="py-2 px-4">אמן</th>
-                  <th className="py-2 px-4">נוסף בתאריך</th>
-                  <th className="py-2 px-4">זמן</th>
-                  <th className="py-2 px-4">נגן</th>
-                  <th className="py-2 px-4">מחיקה</th>
+                  <th className="py-2 px-2">#</th>
+                  <th className="py-2 px-2">שיר</th>
+                  <th className="py-2 px-2 hidden sm:table-cell">אמן</th>
+                  <th className="py-2 px-2 hidden md:table-cell">
+                    נוסף בתאריך
+                  </th>
+                  <th className="py-2 px-2 hidden lg:table-cell">זמן</th>
+                  <th className="py-2 px-2">נגן</th>
+                  <th className="py-2 px-2">מחיקה</th>
                 </tr>
               </thead>
               <tbody>
@@ -112,27 +110,29 @@ export default function UserProfile() {
                         : "hover:bg-gray-800"
                     }`}
                   >
-                    <td className="py-3 px-4 text-gray-400">{index + 1}</td>
-                    <td className="py-3 px-4 flex items-center gap-4">
+                    <td className="py-3 px-2 text-gray-400 text-sm">
+                      {index + 1}
+                    </td>
+                    <td className="py-3 px-2 flex items-center gap-4">
                       <img
                         src={song.cover}
                         alt={song.title}
                         className="w-12 h-12 object-cover rounded"
                       />
-                      <div className="text-right">
-                        <p className="text-white font-semibold">{song.title}</p>
-                      </div>
+                      <span className="text-sm font-medium text-white">
+                        {song.title}
+                      </span>
                     </td>
-                    <td className="py-3 px-4 text-gray-300">
+                    <td className="py-3 px-2 text-sm text-gray-300 hidden sm:table-cell">
                       {song.artist?.name || "אמן לא ידוע"}
                     </td>
-                    <td className="py-3 px-4 text-gray-400">
+                    <td className="py-3 px-2 text-sm text-gray-400 hidden md:table-cell">
                       {formatDate(song.addedAt)}
                     </td>
-                    <td className="py-3 px-4 text-gray-400">
+                    <td className="py-3 px-2 text-sm text-gray-400 hidden lg:table-cell">
                       {song.duration || "3:00"}
                     </td>
-                    <td className="py-3 px-4">
+                    <td className="py-3 px-2">
                       <button
                         onClick={() => togglePlay(song)}
                         className="bg-green-500 text-white rounded-full p-2 hover:bg-green-400 transition"
@@ -156,10 +156,10 @@ export default function UserProfile() {
                         )}
                       </button>
                     </td>
-                    <td className="py-3 px-4">
+                    <td className="py-3 px-2">
                       <button
                         onClick={() => clearSong(song._id)}
-                        className=" hover:text-red-600 text-white p-2"
+                        className="hover:text-red-600 text-white p-2"
                         title="מחק שיר"
                       >
                         <Trash size={18} />
@@ -172,7 +172,8 @@ export default function UserProfile() {
           </div>
         )}
       </div>
-      <div className=" text-center">
+
+      <div className="text-center">
         {likedSongs.length > 0 && (
           <button
             onClick={clearFavorites}
