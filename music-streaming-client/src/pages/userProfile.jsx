@@ -3,6 +3,7 @@ import axios from "axios";
 import { Play, Trash, Pause } from "lucide-react";
 import { useMusicPlayerContext } from "../store/musicPlayerContext";
 import { authClient } from "../clients/auth-client";
+import toast from "react-hot-toast";
 
 export default function UserProfile() {
   const { data } = authClient.useSession();
@@ -44,26 +45,27 @@ export default function UserProfile() {
   };
 
   const clearSong = async (songId) => {
-    // מחיקת שיר בודדת על ידי אייקון פח
+    // מחיקת שיר בודדת על ידי אייקון פח + הוספת הודעות של הסרת שירים מוצלחת
     try {
       const updatedLikedSongs = user.likedSongs.filter((id) => id !== songId);
       await authClient.updateUser({ likedSongs: updatedLikedSongs });
       setLikedSongs((prev) => prev.filter((song) => song._id !== songId));
+      toast.success("השיר הוסר מרשימת האהובים שלך!");
     } catch (err) {
-      console.error("שגיאה במחיקת שיר מהאהובים:", err);
-      alert("אירעה שגיאה בעת הסרת השיר.");
+      //console.error("שגיאה במחיקת שיר מהאהובים:", err);
+      toast.error("אירעה שגיאה בעת הסרת השיר.");
     }
   };
 
   const clearFavorites = async () => {
-    // כפתור מחיקה של כל השירים מאיזור הלקוח
+    // כפתור מחיקה של כל השירים מאיזור הלקוח + הוספת הודעה להסרת כל השירים
     try {
       await authClient.updateUser({ likedSongs: [] });
       setLikedSongs([]);
-      alert("רשימת האהובים שלך פונתה בהצלחה!");
+      toast.success("רשימת האהובים שלך פונתה בהצלחה!");
     } catch (err) {
-      console.error("שגיאה בפינוי רשימת האהובים:", err);
-      alert("שגיאה בפינוי רשימת האהובים");
+      //console.error("שגיאה בפינוי רשימת האהובים:", err);
+      toast.error("שגיאה בפינוי רשימת האהובים");
     }
   };
 
@@ -102,7 +104,14 @@ export default function UserProfile() {
               </thead>
               <tbody>
                 {likedSongs.map((song, index) => (
-                  <tr key={song._id} className="hover:bg-gray-800 transition">
+                  <tr
+                    key={song._id}
+                    className={`transition duration-300 ${
+                      state.currentSong?._id === song._id && state.isPlaying
+                        ? "bg-gray-600"
+                        : "hover:bg-gray-800"
+                    }`}
+                  >
                     <td className="py-3 px-4 text-gray-400">{index + 1}</td>
                     <td className="py-3 px-4 flex items-center gap-4">
                       <img
@@ -150,7 +159,7 @@ export default function UserProfile() {
                     <td className="py-3 px-4">
                       <button
                         onClick={() => clearSong(song._id)}
-                        className=" hover:bg-red-600 text-white rounded-full p-2"
+                        className=" hover:text-red-600 text-white p-2"
                         title="מחק שיר"
                       >
                         <Trash size={18} />

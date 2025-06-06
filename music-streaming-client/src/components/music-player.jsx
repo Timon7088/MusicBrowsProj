@@ -11,14 +11,14 @@ import {
 
 export default function MusicPlayer() {
   const audioRef = useRef(null);
+  const previousSongUrlRef = useRef(null);
   const { state, dispatch } = useMusicPlayerContext();
   const currentSong = state.currentSong;
 
-  const [volume, setVolume] = useState(0.2); // ווליום התחלתי
+  const [volume, setVolume] = useState(0.2);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
 
-  // עדכון זמן תוך כדי ניגון
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -38,24 +38,43 @@ export default function MusicPlayer() {
     };
   }, [volume, currentSong]);
 
-  // טוען שיר חדש
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio || !currentSong) return;
-    audio.load();
-  }, [currentSong]);
+    if (duration > 0 && Math.floor(currentTime) === Math.floor(duration)) {
+      dispatch({ type: "SONG_ENDED" });
+    }
+  }, [currentTime, duration]);
 
-  // הפעלה אוטומטית לפי state
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
+    const handleEnded = () => {
+      dispatch({ type: "SONG_ENDED" });
+    };
+
+    audio.addEventListener("ended", handleEnded);
+    return () => audio.removeEventListener("ended", handleEnded);
+  }, [dispatch]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio || !currentSong) return;
+
+    const isSameSong = previousSongUrlRef.current === currentSong.url;
+
+    if (!isSameSong) {
+      audio.load();
+      previousSongUrlRef.current = currentSong.url;
+    }
+
     if (state.isPlaying) {
-      audio.play().catch(() => dispatch({ type: "PAUSE" }));
+      audio.play().catch(() => {
+        dispatch({ type: "PAUSE" });
+      });
     } else {
       audio.pause();
     }
-  }, [state.isPlaying, currentSong]);
+  }, [currentSong, state.isPlaying]);
 
   const togglePlay = async () => {
     const audio = audioRef.current;
@@ -67,15 +86,12 @@ export default function MusicPlayer() {
       } else {
         if (audio.readyState < 3) {
           audio.load();
-          setTimeout(() => {
-            dispatch({ type: "PLAY" });
-          }, 50);
+          setTimeout(() => dispatch({ type: "PLAY" }), 50);
           return;
         }
         dispatch({ type: "PLAY" });
       }
-    } catch (err) {
-      console.error("שגיאה בפעולת ניגון:", err);
+    } catch {
       dispatch({ type: "PAUSE" });
     }
   };
@@ -113,13 +129,11 @@ export default function MusicPlayer() {
 
   return (
     <div className="fixed bottom-0 left-0 w-full bg-gray-800 text-white px-4 py-2 flex flex-col gap-2 z-50 shadow-md border-t border-green-500">
-      <audio ref={audioRef} preload="auto">
+      <audio key={currentSong.url} ref={audioRef} preload="auto">
         <source src={currentSong.url} type="audio/mpeg" />
       </audio>
 
-      {/* שורת שליטה עליונה - 3 עמודות */}
       <div className="grid grid-cols-3 items-center gap-3 sm:gap-6 w-full max-w-6xl mx-auto">
-        {/* פרטי שיר - שמאל */}
         <div className="flex items-center gap-3 min-w-0 overflow-hidden">
           <img
             src={currentSong.cover}
@@ -136,12 +150,11 @@ export default function MusicPlayer() {
           </div>
         </div>
 
-        {/* כפתורי ניגון - מרכז */}
         <div className="flex items-center justify-center gap-4">
           <button onClick={() => dispatch({ type: "PREVIOUS_SONG" })}>
             <SkipBack
-              size={20}
               className="text-green-500 hover:text-green-400 transition"
+              size={20}
             />
           </button>
           <button
@@ -156,8 +169,8 @@ export default function MusicPlayer() {
           </button>
           <button onClick={() => dispatch({ type: "NEXT_SONG" })}>
             <SkipForward
-              size={20}
               className="text-green-500 hover:text-green-400 transition"
+              size={20}
             />
           </button>
           <button
@@ -165,15 +178,13 @@ export default function MusicPlayer() {
             className={`transition ${
               state.isShuffled
                 ? "text-green-500 hover:text-green-400"
-                : "text-white-900 hover:text-gray-600"
+                : "text-white hover:text-gray-600"
             }`}
-            title={state.isShuffled ? "Shuffle פעיל" : "הפעל Shuffle"}
           >
             <Shuffle size={20} />
           </button>
         </div>
 
-        {/* ווליום - ימין */}
         <div className="flex gap-2 items-center justify-end w-full sm:w-40">
           <Volume2 size={18} className="text-gray-300" />
           <input
@@ -188,7 +199,6 @@ export default function MusicPlayer() {
         </div>
       </div>
 
-      {/* פס זמן */}
       <div className="flex items-center gap-3 w-full max-w-6xl mx-auto px-1">
         <span className="text-xs text-gray-400">{formatTime(currentTime)}</span>
         <input

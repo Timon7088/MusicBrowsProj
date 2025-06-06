@@ -1,9 +1,11 @@
 export const initialState = {
-    isPlaying: false,
-    currentSong: null,
-    queue: [],
-    currentIndex: -1,
-  };
+  queue: [],
+  originalQueue: [],
+  currentIndex: -1,
+  currentSong: null,
+  isPlaying: false,
+  isShuffled: false,
+};
   
   export function reducer(state, action) {
     switch (action.type) {
@@ -11,6 +13,7 @@ export const initialState = {
         return {
           ...state,
           queue: action.payload,
+          originalQueue: action.payload,
           currentIndex: 0,
           currentSong: action.payload[0] || null,
         };
@@ -41,43 +44,74 @@ export const initialState = {
           isPlaying: false,
         };
   
-      case "NEXT_SONG": {
-        const nextIndex = state.currentIndex + 1;
-        if (nextIndex >= state.queue.length) return state;
+        case "NEXT_SONG": {
+          const nextIndex = state.currentIndex + 1;
+          const newIndex = nextIndex >= state.queue.length ? 0 : nextIndex;
+        
+          return {
+            ...state,
+            currentIndex: newIndex,
+            currentSong: { ...state.queue[newIndex] },
+            isPlaying: true,
+          };
+        }
   
-        return {
-          ...state,
-          currentIndex: nextIndex,
-          currentSong: { ...state.queue[nextIndex] },
-          isPlaying: true,
-        };
-      }
-  
-      case "PREVIOUS_SONG": {
-        const prevIndex = state.currentIndex - 1;
-        if (prevIndex < 0) return state;
-  
-        return {
-          ...state,
-          currentIndex: prevIndex,
-          currentSong: { ...state.queue[prevIndex] },
-          isPlaying: true,
-        };
-      }
+        case "PREVIOUS_SONG": {
+          const prevIndex = state.currentIndex - 1;
+          const newIndex = prevIndex < 0 ? state.queue.length - 1 : prevIndex;
+        
+          return {
+            ...state,
+            currentIndex: newIndex,
+            currentSong: { ...state.queue[newIndex] },
+            isPlaying: true,
+          };
+        }
 
-      case "TOGGLE_SHUFFLE": {
-        const shuffleSongs = [...state.queue];
-        if(!state.isShuffled) {
-          for (let i = shuffleSongs.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [shuffleSongs[i], shuffleSongs[j]] = [shuffleSongs[j], shuffleSongs[i]];
+        case "SONG_ENDED": {
+          const nextIndex = state.currentIndex + 1;
+          const newIndex = nextIndex >= state.queue.length ? 0 : nextIndex;
+
+          return{
+            ...state,
+            currentIndex: newIndex,
+            currentSong: { ...state.queue[newIndex] },
+            isPlaying: true,
+          };
+        }
+
+        case "TOGGLE_SHUFFLE": {
+          if (!state.currentSong) return state; // אין שיר נוכחי? לא נבצע כלום
+        
+          if (!state.isShuffled) {
+            // ערבוב
+            const shuffled = [...state.queue];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1));
+              [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+        
+            const newIndex = shuffled.findIndex(song => song._id === state.currentSong._id);
+        
+            return {
+              ...state,
+              isShuffled: true,
+              queue: shuffled,
+              currentIndex: newIndex,
+            };
+          } else {
+            // חזרה לתור המקורי
+            const newIndex = state.originalQueue.findIndex(song => song._id === state.currentSong._id);
+        
+            return {
+              ...state,
+              isShuffled: false,
+              queue: [...state.originalQueue],
+              currentIndex: newIndex,
+            };
           }
         }
-        return{
-          ...state, queue: shuffleSongs,
-          isShuffled: !state.isShuffled,
-        };
-      }
+        
 
       default:
         return state;

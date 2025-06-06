@@ -29,8 +29,6 @@ export default function Register() {
         setErrorMessage("ההרשמה נכשלה-נסה שוב.");
       }
     } catch (err) {
-      // const msgLower = serverMsg.toLowerCase();
-
       if (err?.status === 422) {
         setErrorMessage("האימייל הזה כבר קיים במערכת, נסה מייל אחר.");
       }

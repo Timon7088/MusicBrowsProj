@@ -71,7 +71,21 @@ const songData = [
     artist: getArtistId("Deep Purple"),
     cover: "/images/Highway-Star.jpeg",
     url: "/songs/Highway-Star.mp3",
+    duration: "6:07",
+  },
+  {
+    title: "Smoke on the Water",
+    artist: getArtistId("Deep Purple"),
+    cover: "/images/Smoke-On-The-Water.jpg",
+    url: "/songs/Smoke-On-The-Water.mp3",
     duration: "6:14",
+  },
+  {
+    title: "Perfect Strangers",
+    artist: getArtistId("Deep Purple"),
+    cover: "/images/Perfect-Strangers.jpg",
+    url: "/songs/Perfect-Strangers.mp3",
+    duration: "5:45",
   },
   {
     title: "November Rain",
@@ -156,6 +170,20 @@ const songData = [
     cover: "/images/Linkin-Park-Numb.jpg",
     url: "/songs/Linkin-Park-Numb.mp3",
     duration: "3:07",
+  },
+  {
+    title: "Dust in the wind",
+    artist: getArtistId("Kansas"),
+    cover: "/images/Kansas-Dust-in-the-Wind.jpeg",
+    url: "/songs/Kansas-Dust-in-the-Wind.mp3",
+    duration: "3:25",
+  },
+  {
+    title: "The Wall",
+    artist: getArtistId("Kansas"),
+    cover: "/images/Carry-on-my-wayward-son.jpeg",
+    url: "/songs/Kansas-The-Wall.mp3",
+    duration: "4:47",
   },
 ];
 

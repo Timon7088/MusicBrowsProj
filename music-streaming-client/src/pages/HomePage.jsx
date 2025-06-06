@@ -1,7 +1,7 @@
 import React from "react";
 import PlayListCube from "../components/PlayListCube";
 import Artist from "../components/Artist";
-import SongCarousel from "../components/songsCarousel";
+import SongCarousel from "../components/SongCarousel";
 import { authClient } from "../clients/auth-client";
 
 export default function Home() {
