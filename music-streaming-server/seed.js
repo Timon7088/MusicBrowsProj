@@ -39,6 +39,13 @@ const songData = [
     duration: "3:06",
   },
   {
+    title: "Guns N' Roses Dont Cry",
+    artist: getArtistId("Guns N' Roses"),
+    cover: "/images/Guns-n-roses-dont-cry.jpg",
+    url: "/songs/Guns-n-roses-dont-cry.mp3",
+    duration: "4:44",
+  },
+  {
     title: "Avenged-Sevenfold Dear God",
     artist: getArtistId("Avenged Sevenfold"),
     cover: "/images/Avenged-Sevenfold-Dear-God.jpeg",

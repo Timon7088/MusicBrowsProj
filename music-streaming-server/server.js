@@ -3,7 +3,6 @@ import cors from "cors";
 import mongoose from "mongoose";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./Auth.js";
-
 import songRoutes from "./routes/songRoutes.js";
 import artistRoutes from "./routes/artistRoutes.js";
 
