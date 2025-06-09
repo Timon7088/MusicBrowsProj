@@ -10,6 +10,7 @@ import { authClient } from "../clients/auth-client";
 import toast from "react-hot-toast";
 
 export default function SongCarousel() {
+  const SERVER_URL = "http://localhost:4000";
   const [songs, setSongs] = useState([]);
   const { data } = authClient.useSession();
   const user = data?.user;
@@ -100,7 +101,7 @@ export default function SongCarousel() {
               )}
 
               <img
-                src={song.cover}
+                src={`${SERVER_URL}${song.cover}`}
                 alt={song.title}
                 className="w-full h-40 object-contain rounded-xl"
               />

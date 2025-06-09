@@ -1,8 +1,24 @@
 import express from 'express';
-import { getAllSongs, getSongById, createSong, updateSong, deleteSong } from '../dao/songDao.js';
+import {
+  getAllSongs,
+  getSongById,
+  createSong,
+  updateSong,
+  deleteSong
+} from '../dao/songDao.js';
+import fs from 'fs';
+import path from 'path';
+import multer from 'multer';
+import { fileURLToPath } from 'url';
+import { parseBuffer } from 'music-metadata';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const router = express.Router();
+const upload = multer();
 
+// GET all songs
 router.get('/', async (req, res) => {
   try {
     const songs = await getAllSongs();
@@ -12,6 +28,7 @@ router.get('/', async (req, res) => {
   }
 });
 
+// GET song by ID
 router.get('/:id', async (req, res) => {
   try {
     const song = await getSongById(req.params.id);
@@ -24,15 +41,82 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
-  try {
-    const newSong = await createSong(req.body);
-    res.status(201).json(newSong);
-  } catch (error) {
-    res.status(500).json({ message: 'Error creating song', error: error.message });
-  }
-});
+// POST new song
+router.post(
+  '/',
+  upload.fields([
+    { name: 'url', maxCount: 1 },
+    { name: 'cover', maxCount: 1 }
+  ]),
+  async (req, res) => {
+    try {
+      const songsDir = path.join(__dirname, '../public/songs');
+      const imagesDir = path.join(__dirname, '../public/images');
 
+      if (!fs.existsSync(songsDir)) fs.mkdirSync(songsDir, { recursive: true });
+      if (!fs.existsSync(imagesDir)) fs.mkdirSync(imagesDir, { recursive: true });
+
+      const audioFile = req.files?.url?.[0];
+      const coverFile = req.files?.cover?.[0];
+
+      let audioPath = '';
+      let coverPath = '';
+      let duration = '0:00';
+
+      // Handle audio file
+      if (audioFile) {
+        const audioFileName = audioFile.originalname;
+        const audioFilePath = path.join(songsDir, audioFileName);
+
+        if (fs.existsSync(audioFilePath)) {
+          return res.status(400).json({ message: 'A file with this name already exists' });
+        }
+
+        fs.writeFileSync(audioFilePath, audioFile.buffer);
+        audioPath = `/songs/${audioFileName}`;
+
+        try {
+          const metadata = await parseBuffer(audioFile.buffer, audioFile.mimetype);
+          const durationInSeconds = Math.round(metadata.format.duration || 0);
+          const minutes = Math.floor(durationInSeconds / 60);
+          const seconds = durationInSeconds % 60;
+          duration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        } catch (error) {
+          console.error('Error reading audio duration:', error);
+        }
+      }
+
+      // Handle cover image
+      if (coverFile) {
+        const coverFileName = coverFile.originalname;
+        const coverFilePath = path.join(imagesDir, coverFileName);
+
+        if (fs.existsSync(coverFilePath)) {
+          return res.status(400).json({ message: 'A file with this name already exists' });
+        }
+
+        fs.writeFileSync(coverFilePath, coverFile.buffer);
+        coverPath = `/images/${coverFileName}`;
+      }
+
+      const song = {
+        title: req.body.title,
+        artist: req.body.artist,
+        duration: duration,
+        url: audioPath,
+        cover: coverPath
+      };
+
+      const newSong = await createSong(song);
+      res.status(201).json(newSong);
+    } catch (error) {
+      console.error('Error creating song:', error);
+      res.status(500).json({ message: 'Error creating song', error: error.message });
+    }
+  }
+);
+
+// PUT update song by ID
 router.put('/:id', async (req, res) => {
   try {
     const updatedSong = await updateSong(req.params.id, req.body);
@@ -45,6 +129,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+// DELETE song by ID
 router.delete('/:id', async (req, res) => {
   try {
     const deletedSong = await deleteSong(req.params.id);

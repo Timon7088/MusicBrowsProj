@@ -10,11 +10,11 @@ import {
 } from "lucide-react";
 
 export default function MusicPlayer() {
+  const SERVER_URL = "http://localhost:4000";
   const audioRef = useRef(null);
   const previousSongUrlRef = useRef(null);
   const { state, dispatch } = useMusicPlayerContext();
   const currentSong = state.currentSong;
-
   const [volume, setVolume] = useState(0.2);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
@@ -130,13 +130,13 @@ export default function MusicPlayer() {
   return (
     <div className="fixed bottom-0 left-0 w-full bg-gray-800 text-white px-4 py-2 flex flex-col gap-2 z-50 shadow-md border-t border-green-500">
       <audio key={currentSong.url} ref={audioRef} preload="auto">
-        <source src={currentSong.url} type="audio/mpeg" />
+        <source src={`${SERVER_URL}${currentSong.url}`} type="audio/mpeg" />
       </audio>
 
       <div className="grid grid-cols-3 items-center gap-3 sm:gap-6 w-full max-w-6xl mx-auto">
         <div className="flex items-center gap-3 min-w-0 overflow-hidden">
           <img
-            src={currentSong.cover}
+            src={`${SERVER_URL}${currentSong.cover}`}
             alt="cover"
             className="w-10 h-10 rounded object-cover"
           />

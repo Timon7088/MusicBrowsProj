@@ -7,6 +7,7 @@ import { authClient } from "../clients/auth-client";
 import toast from "react-hot-toast";
 
 export default function ArtistPage() {
+  const SERVER_URL = "http://localhost:4000";
   const { id } = useParams();
   const [songs, setSongs] = useState([]);
   const [artist, setArtist] = useState(null);
@@ -45,12 +46,10 @@ export default function ArtistPage() {
         const updatedLikedSongs = user.likedSongs.filter((id) => id !== songId);
         await authClient.updateUser({ likedSongs: updatedLikedSongs });
         toast.error("השיר הוסר מרשימת האהובים שלך!");
-        setUser({ ...user, likedSongs: updatedLikedSongs });
       } else {
         const updatedLikedSongs = [...(user.likedSongs || []), songId];
         await authClient.updateUser({ likedSongs: updatedLikedSongs });
         toast.success("השיר נוסף לרשימת האהובים שלך!");
-        setUser({ ...user, likedSongs: updatedLikedSongs });
       }
     } catch (err) {
       toast.error("שגיאה בהוספת השיר לרשימת האהובים");
@@ -69,7 +68,7 @@ export default function ArtistPage() {
       <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-10">
         {artist.image && (
           <img
-            src={artist.image}
+            src={`${SERVER_URL}${artist.image}`}
             alt={artist.name}
             className="w-40 h-40 rounded-lg object-cover shadow-md"
           />
@@ -117,7 +116,7 @@ export default function ArtistPage() {
                     </td>
                     <td className="py-3 px-2 flex items-center gap-4">
                       <img
-                        src={song.cover}
+                        src={`${SERVER_URL}${song.cover}`}
                         alt={song.title}
                         className="w-12 h-12 object-cover rounded"
                       />

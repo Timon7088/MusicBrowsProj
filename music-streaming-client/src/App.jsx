@@ -10,6 +10,7 @@ import UserProfile from "./pages/userProfile";
 import ArtistPage from "./pages/ArtistPage";
 import { MusicPlayerProvider } from "./store/musicPlayerContext";
 import MusicPlayer from "./components/music-player";
+import SongManagment from "./pages/songManagment";
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
               <Route path="/Login" element={<Login />} />
               <Route path="/userProfile" element={<UserProfile />} />
               <Route path="/artist/:id" element={<ArtistPage />} />
+              <Route path="/admin" element={<SongManagment />} />
             </Routes>
           </main>
 

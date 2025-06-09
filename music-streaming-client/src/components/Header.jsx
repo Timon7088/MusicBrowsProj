@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { authClient } from "../clients/auth-client";
 
 export default function Header() {
+  const SERVER_URL = "http://localhost:4000";
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -25,7 +26,7 @@ export default function Header() {
       {/* לוגו */}
       <div className="ml-4">
         <img
-          src="/images/Music-Brows-Logo.png"
+          src={`${SERVER_URL}/images/Music-Brows-Logo.png`}
           alt="Music-Brows Logo"
           className="h-16 w-auto rounded-md"
         />
@@ -74,6 +75,17 @@ export default function Header() {
               הרשמה
             </Link>
           </>
+        )}
+
+        {user?.role === "admin" && (
+          <Link
+            to="/admin"
+            className="hover:text-green-300"
+            dir="rtl"
+            viewTransition
+          >
+            ניהול שירים אדמין
+          </Link>
         )}
       </nav>
 
