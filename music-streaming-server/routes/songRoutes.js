@@ -80,7 +80,7 @@ router.post(
           const durationInSeconds = Math.round(metadata.format.duration || 0);
           const minutes = Math.floor(durationInSeconds / 60);
           const seconds = durationInSeconds % 60;
-          duration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+          duration = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         } catch (error) {
           console.error('Error reading audio duration:', error);
         }
@@ -140,6 +140,7 @@ router.put(
 
       let audioPath = existingSong.url;
       let coverPath = existingSong.cover;
+      let duration = existingSong.duration;
 
       // Handle audio file update
       if (audioFile) {
@@ -157,7 +158,19 @@ router.put(
         // Save new audio file
         fs.writeFileSync(audioFilePath, audioFile.buffer);
         audioPath = `/songs/${audioFileName}`;
+
+        //update Duration
+        try {
+          const metadata = await parseBuffer(audioFile.buffer, audioFile.mimetype);
+          const durationInSeconds = Math.round(metadata.format.duration || 0);
+          const minutes = Math.floor(durationInSeconds / 60);
+          const seconds = durationInSeconds % 60;
+          duration = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        } catch (error) {
+          console.error('Error reading audio duration:', error);
+        }
       }
+
 
       // Handle cover image update
       if (coverFile) {
@@ -181,6 +194,7 @@ router.put(
       const updateData = {
         title: req.body.title || existingSong.title,
         artist: req.body.artist || existingSong.artist,
+        duration: duration,
         url: audioPath,
         cover: coverPath
       };

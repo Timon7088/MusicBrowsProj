@@ -47,7 +47,7 @@ export default function SongManagment() {
         formData
       );
       toast.success("השיר נוסף בהצלחה!");
-      fetchSongs(); // Refresh songs list
+      setSongs([...songs, response.data]);
       e.target.reset(); // Reset form
     } catch (error) {
       console.error("Error adding song:", error);
@@ -60,12 +60,16 @@ export default function SongManagment() {
     e.preventDefault();
     try {
       const formData = new FormData(e.target);
-      await axios.put(
+      const newSong = await axios.put(
         `http://localhost:4000/api/songs/${selectedSong._id}`,
         formData
       );
       toast.success("השיר עודכן בהצלחה!");
-      fetchSongs(); // Refresh songs list
+      setSongs(
+        songs.map((song) =>
+          song._id === newSong.data._id ? newSong.data : song
+        )
+      ); // Refresh songs list
       setSelectedSong(null); // Reset selected song
     } catch (error) {
       console.error("Error updating song:", error);
