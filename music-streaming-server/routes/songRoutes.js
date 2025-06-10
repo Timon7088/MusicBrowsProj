@@ -117,17 +117,82 @@ router.post(
 );
 
 // PUT update song by ID
-router.put('/:id', async (req, res) => {
-  try {
-    const updatedSong = await updateSong(req.params.id, req.body);
-    if (!updatedSong) {
-      return res.status(404).json({ message: 'Song not found' });
+router.put(
+  '/:id',
+  upload.fields([
+    { name: 'url', maxCount: 1 },
+    { name: 'cover', maxCount: 1 }
+  ]),
+  async (req, res) => {
+    try {
+      const songsDir = path.join(__dirname, '../public/songs');
+      const imagesDir = path.join(__dirname, '../public/images');
+      const songId = req.params.id;
+
+      // Get existing song
+      const existingSong = await getSongById(songId);
+      if (!existingSong) {
+        return res.status(404).json({ message: 'Song not found' });
+      }
+
+      const audioFile = req.files?.url?.[0];
+      const coverFile = req.files?.cover?.[0];
+
+      let audioPath = existingSong.url;
+      let coverPath = existingSong.cover;
+
+      // Handle audio file update
+      if (audioFile) {
+        const audioFileName = audioFile.originalname;
+        const audioFilePath = path.join(songsDir, audioFileName);
+
+        // Delete old audio file if exists
+        if (existingSong.url) {
+          const oldAudioPath = path.join(__dirname, '..', existingSong.url);
+          if (fs.existsSync(oldAudioPath)) {
+            fs.unlinkSync(oldAudioPath);
+          }
+        }
+
+        // Save new audio file
+        fs.writeFileSync(audioFilePath, audioFile.buffer);
+        audioPath = `/songs/${audioFileName}`;
+      }
+
+      // Handle cover image update
+      if (coverFile) {
+        const coverFileName = coverFile.originalname;
+        const coverFilePath = path.join(imagesDir, coverFileName);
+
+        // Delete old cover file if exists
+        if (existingSong.cover) {
+          const oldCoverPath = path.join(__dirname, '..', existingSong.cover);
+          if (fs.existsSync(oldCoverPath)) {
+            fs.unlinkSync(oldCoverPath);
+          }
+        }
+
+        // Save new cover file
+        fs.writeFileSync(coverFilePath, coverFile.buffer);
+        coverPath = `/images/${coverFileName}`;
+      }
+
+      // Prepare update data
+      const updateData = {
+        title: req.body.title || existingSong.title,
+        artist: req.body.artist || existingSong.artist,
+        url: audioPath,
+        cover: coverPath
+      };
+
+      const updatedSong = await updateSong(songId, updateData);
+      res.status(200).json(updatedSong);
+    } catch (error) {
+      console.error('Error updating song:', error);
+      res.status(500).json({ message: 'Error updating song', error: error.message });
     }
-    res.status(200).json(updatedSong);
-  } catch (error) {
-    res.status(500).json({ message: 'Error updating song', error: error.message });
   }
-});
+);
 
 // DELETE song by ID
 router.delete('/:id', async (req, res) => {
