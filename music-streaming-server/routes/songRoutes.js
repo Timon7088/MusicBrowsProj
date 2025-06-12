@@ -11,6 +11,8 @@ import path from 'path';
 import multer from 'multer';
 import { fileURLToPath } from 'url';
 import { parseBuffer } from 'music-metadata';
+import { auth } from '../Auth.js';
+import { MongoClient } from 'mongodb';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -211,13 +213,49 @@ router.put(
 // DELETE song by ID
 router.delete('/:id', async (req, res) => {
   try {
+    // קודם מוצאים את השיר כדי לקבל את נתיבי הקבצים
+    const song = await getSongById(req.params.id);
+    if (!song) {
+      return res.status(404).json({ message: 'השיר לא נמצא' });
+    }
+
+    if (song.url) {
+      const audioPath = path.join(__dirname, '../public', song.url);
+      if (fs.existsSync(audioPath)) {
+        fs.unlinkSync(audioPath);
+      }
+    }
+
+    if (song.cover) {
+      const coverPath = path.join(__dirname, '../public', song.cover);
+      if (fs.existsSync(coverPath)) {
+        fs.unlinkSync(coverPath);
+      }
+    }
+
+    // מחיקת השיר ממסד הנתונים
     const deletedSong = await deleteSong(req.params.id);
     if (!deletedSong) {
-      return res.status(404).json({ message: 'Song not found' });
+      return res.status(404).json({ message: 'השיר לא נמצא' });
     }
-    res.status(200).json({ message: 'Song deleted successfully' });
+    
+    // עדכון המשתמשים דרך MongoDB
+    const client = new MongoClient("mongodb://localhost:27017/musicbrows");
+    await client.connect();
+    const db = client.db();
+    const usersCollection = db.collection("user");
+    
+    await usersCollection.updateMany(
+      { likedSongs: req.params.id },
+      { $pull: { likedSongs: req.params.id } }
+    );
+    
+    await client.close();
+
+    res.status(200).json({ message: 'השיר נמחק בהצלחה' });
   } catch (error) {
-    res.status(500).json({ message: 'Error deleting song', error: error.message });
+    console.error('Error deleting song:', error);
+    res.status(500).json({ message: 'שגיאה במחיקת השיר', error: error.message });
   }
 });
 

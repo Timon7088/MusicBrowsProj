@@ -16,15 +16,19 @@ export default function UserProfile() {
     axios
       .get("http://localhost:4000/api/songs")
       .then((res) => {
-        const userLikedSongs = user.likedSongs.map((likedSong) => {
-          const findLikedSongs = res.data.find(
-            (song) => likedSong === song._id
-          );
-          return {
-            ...findLikedSongs,
-            addedAt: likedSong.addedAt || new Date().toISOString(),
-          };
-        });
+        const userLikedSongs = user.likedSongs
+          .map((likedSong) => {
+            const findLikedSongs = res.data.find(
+              (song) => likedSong === song._id
+            );
+            return findLikedSongs
+              ? {
+                  ...findLikedSongs,
+                  addedAt: likedSong.addedAt || new Date().toISOString(),
+                }
+              : null;
+          })
+          .filter((song) => song !== null);
         setLikedSongs(userLikedSongs);
       })
       .catch((err) => console.error("שגיאה בשליפת שירים:", err));
