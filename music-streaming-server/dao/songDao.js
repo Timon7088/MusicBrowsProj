@@ -12,7 +12,7 @@ export const createSong = async (data) => {
   const song = new Song({
     ...data,
     createdAt: new Date(),
-    updateAt: new Date()
+    updatedAt: new Date()
   });
   return await song.save();
 };

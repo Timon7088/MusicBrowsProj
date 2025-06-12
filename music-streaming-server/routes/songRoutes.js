@@ -11,7 +11,7 @@ import path from 'path';
 import multer from 'multer';
 import { fileURLToPath } from 'url';
 import { parseBuffer } from 'music-metadata';
-import { auth } from '../Auth.js';
+import Artist from '../models/artist.js';
 import { MongoClient } from 'mongodb';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -20,30 +20,30 @@ const __dirname = path.dirname(__filename);
 const router = express.Router();
 const upload = multer();
 
-// GET all songs
+// GET - כל השירים
 router.get('/', async (req, res) => {
   try {
     const songs = await getAllSongs();
     res.status(200).json(songs);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching songs', error: error.message });
+    res.status(500).json({ message: 'שגיאה בטעינת השירים', error: error.message });
   }
 });
 
-// GET song by ID
+// GET - שיר לפי מזהה
 router.get('/:id', async (req, res) => {
   try {
     const song = await getSongById(req.params.id);
     if (!song) {
-      return res.status(404).json({ message: 'Song not found' });
+      return res.status(404).json({ message: 'השיר לא נמצא' });
     }
     res.status(200).json(song);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching song', error: error.message });
+    res.status(500).json({ message: 'שגיאה בטעינת השיר', error: error.message });
   }
 });
 
-// POST new song
+// POST - יצירת שיר חדש וקישור לאמן
 router.post(
   '/',
   upload.fields([
@@ -54,7 +54,6 @@ router.post(
     try {
       const songsDir = path.join(__dirname, '../public/songs');
       const imagesDir = path.join(__dirname, '../public/images');
-
       if (!fs.existsSync(songsDir)) fs.mkdirSync(songsDir, { recursive: true });
       if (!fs.existsSync(imagesDir)) fs.mkdirSync(imagesDir, { recursive: true });
 
@@ -65,18 +64,14 @@ router.post(
       let coverPath = '';
       let duration = '0:00';
 
-      // Handle audio file
       if (audioFile) {
         const audioFileName = audioFile.originalname;
         const audioFilePath = path.join(songsDir, audioFileName);
-
         if (fs.existsSync(audioFilePath)) {
-          return res.status(400).json({ message: 'A file with this name already exists' });
+          return res.status(400).json({ message: 'קובץ אודיו בשם הזה כבר קיים' });
         }
-
         fs.writeFileSync(audioFilePath, audioFile.buffer);
         audioPath = `/songs/${audioFileName}`;
-
         try {
           const metadata = await parseBuffer(audioFile.buffer, audioFile.mimetype);
           const durationInSeconds = Math.round(metadata.format.duration || 0);
@@ -84,41 +79,48 @@ router.post(
           const seconds = durationInSeconds % 60;
           duration = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         } catch (error) {
-          console.error('Error reading audio duration:', error);
+          console.error('שגיאה בחישוב משך השיר:', error);
         }
       }
 
-      // Handle cover image
       if (coverFile) {
         const coverFileName = coverFile.originalname;
         const coverFilePath = path.join(imagesDir, coverFileName);
-
         if (fs.existsSync(coverFilePath)) {
-          return res.status(400).json({ message: 'A file with this name already exists' });
+          return res.status(400).json({ message: 'תמונת עטיפה בשם הזה כבר קיימת' });
         }
-
         fs.writeFileSync(coverFilePath, coverFile.buffer);
         coverPath = `/images/${coverFileName}`;
+      }
+
+      const artist = await Artist.findById(req.body.artist);
+      if (!artist) {
+        return res.status(400).json({ message: 'האמן לא נמצא במסד הנתונים' });
       }
 
       const song = {
         title: req.body.title,
         artist: req.body.artist,
-        duration: duration,
+        duration,
         url: audioPath,
         cover: coverPath
       };
 
       const newSong = await createSong(song);
+
+      await Artist.findByIdAndUpdate(req.body.artist, {
+        $push: { songs: newSong._id }
+      });
+
       res.status(201).json(newSong);
     } catch (error) {
-      console.error('Error creating song:', error);
-      res.status(500).json({ message: 'Error creating song', error: error.message });
+      console.error('שגיאה ביצירת שיר:', error);
+      res.status(500).json({ message: 'שגיאה ביצירת שיר', error: error.message });
     }
   }
 );
 
-// PUT update song by ID
+// PUT - עדכון שיר כולל קבצים וקישור מחדש לאמן
 router.put(
   '/:id',
   upload.fields([
@@ -131,10 +133,9 @@ router.put(
       const imagesDir = path.join(__dirname, '../public/images');
       const songId = req.params.id;
 
-      // Get existing song
       const existingSong = await getSongById(songId);
       if (!existingSong) {
-        return res.status(404).json({ message: 'Song not found' });
+        return res.status(404).json({ message: 'שיר לא נמצא' });
       }
 
       const audioFile = req.files?.url?.[0];
@@ -144,24 +145,14 @@ router.put(
       let coverPath = existingSong.cover;
       let duration = existingSong.duration;
 
-      // Handle audio file update
       if (audioFile) {
+        const oldAudioPath = path.join(__dirname, '..', existingSong.url);
+        if (fs.existsSync(oldAudioPath)) fs.unlinkSync(oldAudioPath);
+
         const audioFileName = audioFile.originalname;
         const audioFilePath = path.join(songsDir, audioFileName);
-
-        // Delete old audio file if exists
-        if (existingSong.url) {
-          const oldAudioPath = path.join(__dirname, '..', existingSong.url);
-          if (fs.existsSync(oldAudioPath)) {
-            fs.unlinkSync(oldAudioPath);
-          }
-        }
-
-        // Save new audio file
         fs.writeFileSync(audioFilePath, audioFile.buffer);
         audioPath = `/songs/${audioFileName}`;
-
-        //update Duration
         try {
           const metadata = await parseBuffer(audioFile.buffer, audioFile.mimetype);
           const durationInSeconds = Math.round(metadata.format.duration || 0);
@@ -169,51 +160,46 @@ router.put(
           const seconds = durationInSeconds % 60;
           duration = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         } catch (error) {
-          console.error('Error reading audio duration:', error);
+          console.error('שגיאה בחישוב משך השיר:', error);
         }
       }
 
-
-      // Handle cover image update
       if (coverFile) {
+        const oldCoverPath = path.join(__dirname, '..', existingSong.cover);
+        if (fs.existsSync(oldCoverPath)) fs.unlinkSync(oldCoverPath);
+
         const coverFileName = coverFile.originalname;
         const coverFilePath = path.join(imagesDir, coverFileName);
-
-        // Delete old cover file if exists
-        if (existingSong.cover) {
-          const oldCoverPath = path.join(__dirname, '..', existingSong.cover);
-          if (fs.existsSync(oldCoverPath)) {
-            fs.unlinkSync(oldCoverPath);
-          }
-        }
-
-        // Save new cover file
         fs.writeFileSync(coverFilePath, coverFile.buffer);
         coverPath = `/images/${coverFileName}`;
       }
 
-      // Prepare update data
       const updateData = {
         title: req.body.title || existingSong.title,
         artist: req.body.artist || existingSong.artist,
-        duration: duration,
+        duration,
         url: audioPath,
         cover: coverPath
       };
 
       const updatedSong = await updateSong(songId, updateData);
+
+      if (req.body.artist && req.body.artist !== existingSong.artist.toString()) {
+        await Artist.findByIdAndUpdate(existingSong.artist, { $pull: { songs: existingSong._id } });
+        await Artist.findByIdAndUpdate(req.body.artist, { $addToSet: { songs: existingSong._id } });
+      }
+
       res.status(200).json(updatedSong);
     } catch (error) {
-      console.error('Error updating song:', error);
-      res.status(500).json({ message: 'Error updating song', error: error.message });
+      console.error('שגיאה בעדכון שיר:', error);
+      res.status(500).json({ message: 'שגיאה בעדכון שיר', error: error.message });
     }
   }
 );
 
-// DELETE song by ID
+// DELETE - כולל הסרה מהאמן וממשתמשים
 router.delete('/:id', async (req, res) => {
   try {
-    // קודם מוצאים את השיר כדי לקבל את נתיבי הקבצים
     const song = await getSongById(req.params.id);
     if (!song) {
       return res.status(404).json({ message: 'השיר לא נמצא' });
@@ -221,41 +207,39 @@ router.delete('/:id', async (req, res) => {
 
     if (song.url) {
       const audioPath = path.join(__dirname, '../public', song.url);
-      if (fs.existsSync(audioPath)) {
-        fs.unlinkSync(audioPath);
-      }
+      if (fs.existsSync(audioPath)) fs.unlinkSync(audioPath);
     }
 
     if (song.cover) {
       const coverPath = path.join(__dirname, '../public', song.cover);
-      if (fs.existsSync(coverPath)) {
-        fs.unlinkSync(coverPath);
-      }
+      if (fs.existsSync(coverPath)) fs.unlinkSync(coverPath);
     }
 
-    // מחיקת השיר ממסד הנתונים
-    const deletedSong = await deleteSong(req.params.id);
-    if (!deletedSong) {
-      return res.status(404).json({ message: 'השיר לא נמצא' });
+    await deleteSong(req.params.id);
+
+    if (song.artist) {
+      await Artist.findByIdAndUpdate(song.artist, {
+        $pull: { songs: song._id }
+      });
     }
-    
-    // עדכון המשתמשים דרך MongoDB
-    const client = new MongoClient("mongodb://localhost:27017/musicbrows");
+
+    // מחיקת מזהה השיר מ־likedSongs של כל המשתמשים
+    const client = new MongoClient('mongodb://localhost:27017/musicbrows');
     await client.connect();
     const db = client.db();
-    const usersCollection = db.collection("user");
-    
+    const usersCollection = db.collection('user');
+
     await usersCollection.updateMany(
-      { likedSongs: req.params.id },
-      { $pull: { likedSongs: req.params.id } }
+      { likedSongs: song._id.toString() },
+      { $pull: { likedSongs: song._id.toString() } }
     );
-    
+
     await client.close();
 
-    res.status(200).json({ message: 'השיר נמחק בהצלחה' });
+    res.status(200).json({ message: 'השיר נמחק בהצלחה כולל הסרה מ-likedSongs' });
   } catch (error) {
-    console.error('Error deleting song:', error);
-    res.status(500).json({ message: 'שגיאה במחיקת השיר', error: error.message });
+    console.error('שגיאה במחיקת שיר:', error);
+    res.status(500).json({ message: 'שגיאה במחיקת שיר', error: error.message });
   }
 });
 
