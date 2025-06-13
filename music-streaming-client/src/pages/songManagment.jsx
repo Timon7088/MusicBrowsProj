@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import Select from "react-select";
 import axios from "axios";
 import { authClient } from "../clients/auth-client";
 import toast from "react-hot-toast";
@@ -91,19 +92,11 @@ export default function SongManagment() {
     }
   };
 
-  // Search and Filter Logic
-  const handleSearch = (e) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-    setShowSuggestions(true);
-  };
-
   const handleSongSelect = (songTitle) => {
     setSearchTerm(songTitle);
     setShowSuggestions(false);
   };
 
-  // Effects
   useEffect(() => {
     fetchArtists();
     fetchSongs();
@@ -121,7 +114,6 @@ export default function SongManagment() {
     setFilteredSongs(filtered);
   }, [searchTerm, songs]);
 
-  // Render Methods
   const renderAddSongForm = () => (
     <form onSubmit={handleAddSong} className="mt-8 space-y-6">
       <div className="space-y-4">
@@ -168,19 +160,49 @@ export default function SongManagment() {
           >
             שם האמן
           </label>
-          <select
-            name="artist"
-            id="artist"
-            required
-            className="mt-1 block w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-          >
-            <option value="">בחר אמן</option>
-            {artists.map((artist) => (
-              <option key={artist._id} value={artist._id}>
-                {artist.name}
-              </option>
-            ))}
-          </select>
+          <Select
+            className="w-full"
+            classNamePrefix="select"
+            options={artists.map((artist) => ({
+              value: artist._id,
+              label: artist.name,
+            }))}
+            onChange={(selectedOption) => {
+              // עדכון הלוגיקה שלך כאן
+            }}
+            placeholder="בחר אמן"
+            styles={{
+              control: (base) => ({
+                ...base,
+                backgroundColor: "#1f2937",
+                borderColor: "#374151",
+                "&:hover": {
+                  borderColor: "#374151",
+                },
+              }),
+              menu: (base) => ({
+                ...base,
+                backgroundColor: "#1f2937",
+                maxHeight: "150px",
+              }),
+              option: (base, state) => ({
+                ...base,
+                backgroundColor: state.isFocused ? "#374151" : "#1f2937",
+                color: "white",
+                "&:hover": {
+                  backgroundColor: "#374151",
+                },
+              }),
+              singleValue: (base) => ({
+                ...base,
+                color: "white",
+              }),
+              input: (base) => ({
+                ...base,
+                color: "white",
+              }),
+            }}
+          />
         </div>
         <div>
           <label
@@ -234,20 +256,50 @@ export default function SongManagment() {
         <label className="block text-sm font-medium text-gray-300 mb-2">
           בחר שיר לעריכה
         </label>
-        <select
-          className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
-          onChange={(e) => {
-            const song = songs.find((s) => s._id === e.target.value);
+        <Select
+          className="w-full"
+          classNamePrefix="select"
+          options={songs.map((song) => ({
+            value: song._id,
+            label: song.title,
+          }))}
+          onChange={(selectedOption) => {
+            const song = songs.find((s) => s._id === selectedOption.value);
             setSelectedSong(song);
           }}
-        >
-          <option value="">בחר שיר</option>
-          {songs.map((song) => (
-            <option key={song._id} value={song._id}>
-              {song.title}
-            </option>
-          ))}
-        </select>
+          placeholder="בחר שיר"
+          styles={{
+            control: (base) => ({
+              ...base,
+              backgroundColor: "#1f2937", // bg-gray-800
+              borderColor: "#374151", // border-gray-700
+              "&:hover": {
+                borderColor: "#374151",
+              },
+            }),
+            menu: (base) => ({
+              ...base,
+              backgroundColor: "#1f2937",
+              maxHeight: "150px", // כאן אתה יכול לשלוט בגובה של הרשימה הנפתחת
+            }),
+            option: (base, state) => ({
+              ...base,
+              backgroundColor: state.isFocused ? "#374151" : "#1f2937",
+              color: "white",
+              "&:hover": {
+                backgroundColor: "#374151",
+              },
+            }),
+            singleValue: (base) => ({
+              ...base,
+              color: "white",
+            }),
+            input: (base) => ({
+              ...base,
+              color: "white",
+            }),
+          }}
+        />
       </div>
 
       {selectedSong && (
@@ -281,23 +333,49 @@ export default function SongManagment() {
               >
                 שם האמן
               </label>
-              <select
-                name="artist"
-                id="artist"
-                required
-                value={selectedSong.artist}
-                onChange={(e) => {
-                  setSelectedSong({ ...selectedSong, artist: e.target.value });
+              <Select
+                className="w-full"
+                classNamePrefix="select"
+                options={artists.map((artist) => ({
+                  value: artist._id,
+                  label: artist.name,
+                }))}
+                onChange={(selectedOption) => {
+                  // עדכון הלוגיקה שלך כאן
                 }}
-                className="mt-1 block w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              >
-                <option value="">בחר אמן</option>
-                {artists.map((artist) => (
-                  <option key={artist._id} value={artist._id}>
-                    {artist.name}
-                  </option>
-                ))}
-              </select>
+                placeholder="בחר אמן"
+                styles={{
+                  control: (base) => ({
+                    ...base,
+                    backgroundColor: "#1f2937",
+                    borderColor: "#374151",
+                    "&:hover": {
+                      borderColor: "#374151",
+                    },
+                  }),
+                  menu: (base) => ({
+                    ...base,
+                    backgroundColor: "#1f2937",
+                    maxHeight: "150px",
+                  }),
+                  option: (base, state) => ({
+                    ...base,
+                    backgroundColor: state.isFocused ? "#374151" : "#1f2937",
+                    color: "white",
+                    "&:hover": {
+                      backgroundColor: "#374151",
+                    },
+                  }),
+                  singleValue: (base) => ({
+                    ...base,
+                    color: "white",
+                  }),
+                  input: (base) => ({
+                    ...base,
+                    color: "white",
+                  }),
+                }}
+              />
             </div>
             <div>
               <label
@@ -420,7 +498,7 @@ export default function SongManagment() {
         </div>
 
         {/* Content Section */}
-        <div className="bg-gray-900 rounded-xl shadow-xl p-8">
+        <div className="bg-gray-900 rounded-xl shadow-xl p-8 max-w-2xl mx-auto">
           {activeTab === "add" && renderAddSongForm()}
           {activeTab === "edit" && renderEditSongForm()}
           {activeTab === "delete" && renderDeleteSongsList()}

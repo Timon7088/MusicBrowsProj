@@ -1,5 +1,6 @@
 import express from "express";
 import { getAllArtists, getArtistById, createArtist, deleteArtist, updateArtist } from "../dao/artistDao.js";
+import { updateSongsAfterArtistDeletion } from "../dao/songDao.js";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -91,21 +92,40 @@ router.delete("/:id", async (req, res) => {
   try {
     const artist = await getArtistById(req.params.id);
     if (!artist) {
-      return res.status(404).json({ message: 'האמן לא נמצא' });
+      return res.status(404).json({ message: "האמן לא נמצא" });
     }
 
     // מחיקת תמונת האמן אם קיימת
     if (artist.image) {
-      const imagePath = path.join(__dirname, '..', artist.image);
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
+      try {
+        // נוודא שהנתיב המלא נכון
+        const imagePath = path.join(__dirname, "..", "public", artist.image);
+        console.log("מנסה למחוק תמונה בנתיב:", imagePath);
+        
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+          console.log("התמונה נמחקה בהצלחה");
+        } else {
+          console.log("התמונה לא נמצאה בנתיב:", imagePath);
+        }
+      } catch (imageError) {
+        console.error("שגיאה במחיקת התמונה:", imageError);
+        // נמשיך עם המחיקה גם אם יש בעיה עם התמונה
       }
     }
 
+    // עדכון כל השירים המקושרים לאמן זה - הסרת הקישור לאמן
+    await updateSongsAfterArtistDeletion(req.params.id);
+
+    // מחיקת האמן
     await deleteArtist(req.params.id);
     res.status(204).end();
   } catch (error) {
-    res.status(500).json({ message: 'שגיאה במחיקת האמן', error: error.message });
+    console.error("שגיאה במחיקת האמן:", error);
+    res.status(500).json({
+      message: "שגיאה במחיקת האמן",
+      error: error.message,
+    });
   }
 });
 

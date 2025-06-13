@@ -13,6 +13,7 @@ import { fileURLToPath } from 'url';
 import { parseBuffer } from 'music-metadata';
 import Artist from '../models/artist.js';
 import { MongoClient } from 'mongodb';
+import mongoose from 'mongoose';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -120,82 +121,82 @@ router.post(
   }
 );
 
-// PUT - עדכון שיר כולל קבצים וקישור מחדש לאמן
-router.put(
-  '/:id',
-  upload.fields([
-    { name: 'url', maxCount: 1 },
-    { name: 'cover', maxCount: 1 }
-  ]),
-  async (req, res) => {
-    try {
-      const songsDir = path.join(__dirname, '../public/songs');
-      const imagesDir = path.join(__dirname, '../public/images');
-      const songId = req.params.id;
+// PUT - עדכון שיר
+router.put("/:id", upload.fields([
+  { name: 'url', maxCount: 1 },
+  { name: 'cover', maxCount: 1 }
+]), async (req, res) => {
+  try {
+    const song = await getSongById(req.params.id);
+    if (!song) {
+      return res.status(404).json({ message: "השיר לא נמצא" });
+    }
 
-      const existingSong = await getSongById(songId);
-      if (!existingSong) {
-        return res.status(404).json({ message: 'שיר לא נמצא' });
-      }
+    console.log("שיר לפני עדכון:", song);
+    console.log("נתוני העדכון:", req.body);
 
-      const audioFile = req.files?.url?.[0];
-      const coverFile = req.files?.cover?.[0];
-
-      let audioPath = existingSong.url;
-      let coverPath = existingSong.cover;
-      let duration = existingSong.duration;
-
-      if (audioFile) {
-        const oldAudioPath = path.join(__dirname, '..', existingSong.url);
-        if (fs.existsSync(oldAudioPath)) fs.unlinkSync(oldAudioPath);
-
-        const audioFileName = audioFile.originalname;
-        const audioFilePath = path.join(songsDir, audioFileName);
-        fs.writeFileSync(audioFilePath, audioFile.buffer);
-        audioPath = `/songs/${audioFileName}`;
-        try {
-          const metadata = await parseBuffer(audioFile.buffer, audioFile.mimetype);
-          const durationInSeconds = Math.round(metadata.format.duration || 0);
-          const minutes = Math.floor(durationInSeconds / 60);
-          const seconds = durationInSeconds % 60;
-          duration = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        } catch (error) {
-          console.error('שגיאה בחישוב משך השיר:', error);
+    // טיפול בקבצי אודיו
+    let audioPath = song.url;
+    if (req.files && req.files.url) {
+      if (song.url) {
+        const oldAudioPath = path.join(__dirname, "../public", song.url);
+        if (fs.existsSync(oldAudioPath)) {
+          fs.unlinkSync(oldAudioPath);
         }
       }
-
-      if (coverFile) {
-        const oldCoverPath = path.join(__dirname, '..', existingSong.cover);
-        if (fs.existsSync(oldCoverPath)) fs.unlinkSync(oldCoverPath);
-
-        const coverFileName = coverFile.originalname;
-        const coverFilePath = path.join(imagesDir, coverFileName);
-        fs.writeFileSync(coverFilePath, coverFile.buffer);
-        coverPath = `/images/${coverFileName}`;
-      }
-
-      const updateData = {
-        title: req.body.title || existingSong.title,
-        artist: req.body.artist || existingSong.artist,
-        duration,
-        url: audioPath,
-        cover: coverPath
-      };
-
-      const updatedSong = await updateSong(songId, updateData);
-
-      if (req.body.artist && req.body.artist !== existingSong.artist.toString()) {
-        await Artist.findByIdAndUpdate(existingSong.artist, { $pull: { songs: existingSong._id } });
-        await Artist.findByIdAndUpdate(req.body.artist, { $addToSet: { songs: existingSong._id } });
-      }
-
-      res.status(200).json(updatedSong);
-    } catch (error) {
-      console.error('שגיאה בעדכון שיר:', error);
-      res.status(500).json({ message: 'שגיאה בעדכון שיר', error: error.message });
+      const audioFileName = `${Date.now()}-${req.files.url[0].originalname}`;
+      const audioFilePath = path.join(__dirname, "../public/songs", audioFileName);
+      fs.writeFileSync(audioFilePath, req.files.url[0].buffer);
+      audioPath = `/songs/${audioFileName}`;
     }
+
+    // טיפול בתמונות כיסוי
+    let coverPath = song.cover;
+    if (req.files && req.files.cover) {
+      if (song.cover) {
+        const oldCoverPath = path.join(__dirname, "../public", song.cover);
+        if (fs.existsSync(oldCoverPath)) {
+          fs.unlinkSync(oldCoverPath);
+        }
+      }
+      const coverFileName = `${Date.now()}-${req.files.cover[0].originalname}`;
+      const coverFilePath = path.join(__dirname, "../public/images", coverFileName);
+      fs.writeFileSync(coverFilePath, req.files.cover[0].buffer);
+      coverPath = `/images/${coverFileName}`;
+    }
+
+    // הכנת נתוני העדכון
+    const songData = {
+      ...req.body,
+      url: audioPath,
+      cover: coverPath
+    };
+
+    // וידוא שה-artist הוא ObjectId תקין
+    if (songData.artist) {
+      try {
+        songData.artist = new mongoose.Types.ObjectId(songData.artist);
+        console.log("ID אמן חדש:", songData.artist);
+      } catch (error) {
+        console.error("שגיאה בהמרת ID אמן:", error);
+        return res.status(400).json({ message: "ID אמן לא תקין" });
+      }
+    }
+
+    console.log("נתוני שיר סופיים לעדכון:", songData);
+
+    const updatedSong = await updateSong(req.params.id, songData);
+    console.log("שיר לאחר עדכון:", updatedSong);
+
+    res.json(updatedSong);
+  } catch (error) {
+    console.error("שגיאה בעדכון השיר:", error);
+    res.status(500).json({
+      message: "שגיאה בעדכון השיר",
+      error: error.message
+    });
   }
-);
+});
 
 // DELETE - כולל הסרה מהאמן וממשתמשים
 router.delete('/:id', async (req, res) => {

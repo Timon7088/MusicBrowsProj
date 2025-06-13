@@ -11,6 +11,7 @@ import ArtistPage from "./pages/ArtistPage";
 import { MusicPlayerProvider } from "./store/musicPlayerContext";
 import MusicPlayer from "./components/music-player";
 import SongManagment from "./pages/songManagment";
+import ArtistManagment from "./pages/artistManagment";
 
 export default function App() {
   return (
@@ -29,7 +30,14 @@ export default function App() {
               <Route path="/Login" element={<Login />} />
               <Route path="/userProfile" element={<UserProfile />} />
               <Route path="/artist/:id" element={<ArtistPage />} />
-              <Route path="/admin" element={<SongManagment />} />
+              <Route
+                path="/admin/songs-management"
+                element={<SongManagment />}
+              />
+              <Route
+                path="/admin/artists-management"
+                element={<ArtistManagment />}
+              />
             </Routes>
           </main>
 

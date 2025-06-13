@@ -23,13 +23,32 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-gray-800 text-white px-4 py-4 shadow-md min-h-[80px] flex items-center justify-between relative">
-      {/* לוגו */}
-      <div className="ml-4">
+      {/* לוגו + ניהול אדמין */}
+      <div className="flex items-center ml-4 space-x-4">
         <img
           src={`${SERVER_URL}/images/Music-Brows-Logo.png`}
           alt="Music-Brows Logo"
           className="h-16 w-auto rounded-md"
         />
+
+        {user?.role === "admin" && (
+          <nav className="hidden md:flex" dir="rtl">
+            <Link
+              to="/admin/songs-management"
+              className="hover:text-green-300 ml-4"
+              viewTransition
+            >
+              שירים אדמין
+            </Link>
+            <Link
+              to="/admin/artists-management"
+              className="hover:text-green-300 ml-4"
+              viewTransition
+            >
+              אמנים אדמין
+            </Link>
+          </nav>
+        )}
       </div>
 
       {/* תפריט ניווט בדסקטופ */}
@@ -76,17 +95,6 @@ export default function Header() {
             </Link>
           </>
         )}
-
-        {user?.role === "admin" && (
-          <Link
-            to="/admin"
-            className="hover:text-green-300"
-            dir="rtl"
-            viewTransition
-          >
-            ניהול שירים אדמין
-          </Link>
-        )}
       </nav>
 
       {/* כפתור המבורגר למובייל */}
@@ -122,6 +130,27 @@ export default function Header() {
               </Link>
             </li>
 
+            {user?.role === "admin" && (
+              <ul className="flex flex-col space-y-2">
+                <li>
+                  <Link
+                    to="/admin/songs-management"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    שירים אדמין
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/admin/artists-management"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    אמנים אדמין
+                  </Link>
+                </li>
+              </ul>
+            )}
+
             {user && (
               <>
                 <li>
@@ -131,7 +160,10 @@ export default function Header() {
                 </li>
                 <li>
                   <button
-                    onClick={handleLogout}
+                    onClick={() => {
+                      setMenuOpen(false);
+                      handleLogout();
+                    }}
                     className="hover:text-green-400"
                   >
                     התנתקות
