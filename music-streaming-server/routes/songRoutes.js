@@ -132,62 +132,59 @@ router.put("/:id", upload.fields([
       return res.status(404).json({ message: "השיר לא נמצא" });
     }
 
-    console.log("שיר לפני עדכון:", song);
-    console.log("נתוני העדכון:", req.body);
-
     // טיפול בקבצי אודיו
     let audioPath = song.url;
     if (req.files && req.files.url) {
-      if (song.url) {
-        const oldAudioPath = path.join(__dirname, "../public", song.url);
-        if (fs.existsSync(oldAudioPath)) {
-          fs.unlinkSync(oldAudioPath);
-        }
-      }
+      const oldAudioPath = path.join(__dirname, "../public", song.url);
+      if (fs.existsSync(oldAudioPath)) fs.unlinkSync(oldAudioPath);
+
       const audioFileName = `${Date.now()}-${req.files.url[0].originalname}`;
       const audioFilePath = path.join(__dirname, "../public/songs", audioFileName);
       fs.writeFileSync(audioFilePath, req.files.url[0].buffer);
       audioPath = `/songs/${audioFileName}`;
     }
 
-    // טיפול בתמונות כיסוי
+    // טיפול בתמונת עטיפה
     let coverPath = song.cover;
     if (req.files && req.files.cover) {
-      if (song.cover) {
-        const oldCoverPath = path.join(__dirname, "../public", song.cover);
-        if (fs.existsSync(oldCoverPath)) {
-          fs.unlinkSync(oldCoverPath);
-        }
-      }
+      const oldCoverPath = path.join(__dirname, "../public", song.cover);
+      if (fs.existsSync(oldCoverPath)) fs.unlinkSync(oldCoverPath);
+
       const coverFileName = `${Date.now()}-${req.files.cover[0].originalname}`;
       const coverFilePath = path.join(__dirname, "../public/images", coverFileName);
       fs.writeFileSync(coverFilePath, req.files.cover[0].buffer);
       coverPath = `/images/${coverFileName}`;
     }
 
-    // הכנת נתוני העדכון
+    // עדכון נתוני שיר
     const songData = {
       ...req.body,
       url: audioPath,
       cover: coverPath
     };
 
-    // וידוא שה-artist הוא ObjectId תקין
+    // בדיקה אם צריך לעדכן את האמן
     if (songData.artist) {
       try {
-        songData.artist = new mongoose.Types.ObjectId(songData.artist);
-        console.log("ID אמן חדש:", songData.artist);
+        const newArtistId = new mongoose.Types.ObjectId(songData.artist);
+        const oldArtistId = song.artist;
+
+        if (oldArtistId && oldArtistId.toString() !== newArtistId.toString()) {
+          await Artist.findByIdAndUpdate(oldArtistId, {
+            $pull: { songs: song._id }
+          });
+
+          await Artist.findByIdAndUpdate(newArtistId, {
+            $addToSet: { songs: song._id }
+          });
+        }
       } catch (error) {
         console.error("שגיאה בהמרת ID אמן:", error);
         return res.status(400).json({ message: "ID אמן לא תקין" });
       }
     }
 
-    console.log("נתוני שיר סופיים לעדכון:", songData);
-
     const updatedSong = await updateSong(req.params.id, songData);
-    console.log("שיר לאחר עדכון:", updatedSong);
-
     res.json(updatedSong);
   } catch (error) {
     console.error("שגיאה בעדכון השיר:", error);

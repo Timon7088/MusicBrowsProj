@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import Select from "react-select";
 import axios from "axios";
 import { authClient } from "../clients/auth-client";
@@ -43,6 +42,17 @@ export default function SongManagment() {
     e.preventDefault();
     try {
       const formData = new FormData(e.target);
+
+      // וידוא שכל השדות הנדרשים קיימים
+      if (
+        !formData.get("title") ||
+        !formData.get("artist") ||
+        !formData.get("url")
+      ) {
+        toast.error("חובה למלא את כל השדות הנדרשים");
+        return;
+      }
+
       const response = await axios.post(
         "http://localhost:4000/api/songs",
         formData
@@ -52,7 +62,7 @@ export default function SongManagment() {
       e.target.reset(); // Reset form
     } catch (error) {
       console.error("Error adding song:", error);
-      toast.error("שגיאה בהוספת השיר");
+      toast.error(error.response?.data?.message || "שגיאה בהוספת השיר");
     }
   };
 
@@ -168,7 +178,18 @@ export default function SongManagment() {
               label: artist.name,
             }))}
             onChange={(selectedOption) => {
-              // עדכון הלוגיקה שלך כאן
+              const form = document.querySelector("form");
+              const artistInput = document.createElement("input");
+              artistInput.type = "hidden";
+              artistInput.name = "artist";
+              artistInput.value = selectedOption.value;
+
+              const existingInput = form.querySelector('input[name="artist"]');
+              if (existingInput) {
+                existingInput.remove();
+              }
+
+              form.appendChild(artistInput);
             }}
             placeholder="בחר אמן"
             styles={{
@@ -341,7 +362,20 @@ export default function SongManagment() {
                   label: artist.name,
                 }))}
                 onChange={(selectedOption) => {
-                  // עדכון הלוגיקה שלך כאן
+                  const form = document.querySelector("form");
+                  const artistInput = document.createElement("input");
+                  artistInput.type = "hidden";
+                  artistInput.name = "artist";
+                  artistInput.value = selectedOption.value;
+
+                  const existingInput = form.querySelector(
+                    'input[name="artist"]'
+                  );
+                  if (existingInput) {
+                    existingInput.remove();
+                  }
+
+                  form.appendChild(artistInput);
                 }}
                 placeholder="בחר אמן"
                 styles={{
