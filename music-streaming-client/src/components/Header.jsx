@@ -47,6 +47,13 @@ export default function Header() {
             >
               אמנים אדמין
             </Link>
+            <Link
+              to="auth/admin/users"
+              className="hover:text-green-300 ml-4"
+              viewTransition
+            >
+              ניהול משתמשים
+            </Link>
           </nav>
         )}
       </div>

@@ -12,6 +12,7 @@ import { MusicPlayerProvider } from "./store/musicPlayerContext";
 import MusicPlayer from "./components/music-player";
 import SongManagment from "./pages/songManagment";
 import ArtistManagment from "./pages/artistManagment";
+import UserManagment from "./pages/userManagment";
 
 export default function App() {
   return (
@@ -21,7 +22,7 @@ export default function App() {
           <Toaster position="top-center" />
           <Header />
 
-          <main className="flex-grow p-4 mb-8">
+          <main className="flex-grow p-4 mb-10">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/About" element={<About />} />
@@ -37,6 +38,10 @@ export default function App() {
               <Route
                 path="/admin/artists-management"
                 element={<ArtistManagment />}
+              />
+                            <Route
+                path="auth/admin/users"
+                element={<UserManagment />}
               />
             </Routes>
           </main>
