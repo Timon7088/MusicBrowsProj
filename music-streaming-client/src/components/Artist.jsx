@@ -7,6 +7,7 @@ import axios from "axios";
 import { Link } from "react-router-dom"; // הוספת Link
 
 export default function Artist() {
+  const SERVER_URL = "http://localhost:4000";
   const [artists, setArtists] = useState([]);
 
   useEffect(() => {
@@ -33,7 +34,7 @@ export default function Artist() {
             <Link to={`/artist/${artist._id}`}>
               <div className="overflow-hidden transition cursor-pointer m-auto flex flex-col items-center w-44 h-56">
                 <img
-                  src={artist.image}
+                  src={`${SERVER_URL}${artist.image}`}
                   alt={artist.name}
                   className="w-40 h-40 rounded-full object-cover mb-2"
                 />

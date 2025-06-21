@@ -1,5 +1,4 @@
 import React from "react";
-import PlayListCube from "../components/PlayListCube";
 import Artist from "../components/Artist";
 import SongCarousel from "../components/SongCarousel";
 import { authClient } from "../clients/auth-client";
@@ -19,12 +18,6 @@ export default function Home() {
         השירים שלנו
       </h2>
       <SongCarousel />
-
-      {/* כותרת פלייליסטים
-      <h2 className="mt-5 text-3xl font-bold mb-4 text-white text-center">
-        פלייליסטים מוכנים
-      </h2>
-      <PlayListCube /> */}
 
       {/* כותרת אמנים */}
       <h2 className="mt-5 text-3xl font-bold mb-4 text-white text-center">

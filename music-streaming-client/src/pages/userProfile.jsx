@@ -6,6 +6,7 @@ import { authClient } from "../clients/auth-client";
 import toast from "react-hot-toast";
 
 export default function UserProfile() {
+  const SERVER_URL = "http://localhost:4000";
   const { data } = authClient.useSession();
   const user = data.user;
   const [likedSongs, setLikedSongs] = useState([]);
@@ -15,15 +16,19 @@ export default function UserProfile() {
     axios
       .get("http://localhost:4000/api/songs")
       .then((res) => {
-        const userLikedSongs = user.likedSongs.map((likedSong) => {
-          const findLikedSongs = res.data.find(
-            (song) => likedSong === song._id
-          );
-          return {
-            ...findLikedSongs,
-            addedAt: likedSong.addedAt || new Date().toISOString(),
-          };
-        });
+        const userLikedSongs = user.likedSongs
+          .map((likedSong) => {
+            const findLikedSongs = res.data.find(
+              (song) => likedSong === song._id
+            );
+            return findLikedSongs
+              ? {
+                  ...findLikedSongs,
+                  addedAt: likedSong.addedAt || new Date().toISOString(),
+                }
+              : null;
+          })
+          .filter((song) => song !== null);
         setLikedSongs(userLikedSongs);
       })
       .catch((err) => console.error("שגיאה בשליפת שירים:", err));
@@ -115,7 +120,7 @@ export default function UserProfile() {
                     </td>
                     <td className="py-3 px-2 flex items-center gap-4">
                       <img
-                        src={song.cover}
+                        src={`${SERVER_URL}${song.cover}`}
                         alt={song.title}
                         className="w-12 h-12 object-cover rounded"
                       />

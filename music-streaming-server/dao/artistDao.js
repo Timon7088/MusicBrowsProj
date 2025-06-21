@@ -1,4 +1,5 @@
 import Artist from "../models/artist.js";
+import mongoose from "mongoose";
 
 export const getAllArtists = async () => {
   return await Artist.find().populate("songs");

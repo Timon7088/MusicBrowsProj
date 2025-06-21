@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { authClient } from "../clients/auth-client";
 
 export default function Header() {
+  const SERVER_URL = "http://localhost:4000";
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -22,13 +23,25 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-gray-800 text-white px-4 py-4 shadow-md min-h-[80px] flex items-center justify-between relative">
-      {/* לוגו */}
-      <div className="ml-4">
+      {/* לוגו + עריכות אדמין */}
+      <div className="flex items-center ml-4 space-x-4">
         <img
-          src="/images/Music-Brows-Logo.png"
+          src={`${SERVER_URL}/images/Music-Brows-Logo.png`}
           alt="Music-Brows Logo"
           className="h-16 w-auto rounded-md"
         />
+
+        {user?.role === "admin" && (
+          <nav className="hidden md:flex sm:text-sm" dir="rtl">
+            <Link
+              to="/admin/dashboard"
+              className="hover:text-green-300 ml-4"
+              viewTransition
+            >
+              עריכות אדמין
+            </Link>
+          </nav>
+        )}
       </div>
 
       {/* תפריט ניווט בדסקטופ */}
@@ -110,6 +123,17 @@ export default function Header() {
               </Link>
             </li>
 
+            {user?.role === "admin" && (
+              <li>
+                <Link
+                  to="/admin/dashboard"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  עריכות אדמין
+                </Link>
+              </li>
+            )}
+
             {user && (
               <>
                 <li>
@@ -119,7 +143,10 @@ export default function Header() {
                 </li>
                 <li>
                   <button
-                    onClick={handleLogout}
+                    onClick={() => {
+                      setMenuOpen(false);
+                      handleLogout();
+                    }}
                     className="hover:text-green-400"
                   >
                     התנתקות
