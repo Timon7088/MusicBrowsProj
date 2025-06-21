@@ -23,7 +23,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-gray-800 text-white px-4 py-4 shadow-md min-h-[80px] flex items-center justify-between relative">
-      {/* לוגו + ניהול אדמין */}
+      {/* לוגו + עריכות אדמין */}
       <div className="flex items-center ml-4 space-x-4">
         <img
           src={`${SERVER_URL}/images/Music-Brows-Logo.png`}
@@ -32,27 +32,13 @@ export default function Header() {
         />
 
         {user?.role === "admin" && (
-          <nav className="hidden md:flex" dir="rtl">
+          <nav className="hidden md:flex sm:text-sm" dir="rtl">
             <Link
-              to="/admin/songs-management"
+              to="/admin/dashboard"
               className="hover:text-green-300 ml-4"
               viewTransition
             >
-              שירים אדמין
-            </Link>
-            <Link
-              to="/admin/artists-management"
-              className="hover:text-green-300 ml-4"
-              viewTransition
-            >
-              אמנים אדמין
-            </Link>
-            <Link
-              to="auth/admin/users"
-              className="hover:text-green-300 ml-4"
-              viewTransition
-            >
-              ניהול משתמשים
+              עריכות אדמין
             </Link>
           </nav>
         )}
@@ -138,24 +124,14 @@ export default function Header() {
             </li>
 
             {user?.role === "admin" && (
-              <ul className="flex flex-col space-y-2">
-                <li>
-                  <Link
-                    to="/admin/songs-management"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    שירים אדמין
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/admin/artists-management"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    אמנים אדמין
-                  </Link>
-                </li>
-              </ul>
+              <li>
+                <Link
+                  to="/admin/dashboard"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  עריכות אדמין
+                </Link>
+              </li>
             )}
 
             {user && (

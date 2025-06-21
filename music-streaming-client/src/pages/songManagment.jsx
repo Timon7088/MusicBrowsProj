@@ -42,8 +42,6 @@ export default function SongManagment() {
     e.preventDefault();
     try {
       const formData = new FormData(e.target);
-
-      // וידוא שכל השדות הנדרשים קיימים
       if (
         !formData.get("title") ||
         !formData.get("artist") ||
@@ -301,7 +299,7 @@ export default function SongManagment() {
             menu: (base) => ({
               ...base,
               backgroundColor: "#1f2937",
-              maxHeight: "150px", // כאן אתה יכול לשלוט בגובה של הרשימה הנפתחת
+              maxHeight: "150px",
             }),
             option: (base, state) => ({
               ...base,
@@ -507,7 +505,7 @@ export default function SongManagment() {
         <div className="flex justify-center space-x-4 mb-8">
           <button
             className={`px-6 py-3 rounded-lg transition-all ml-4 ${
-              activeTab === "add" ? "bg-green-500" : "bg-gray-800"
+              activeTab === "add" ? "bg-green-500 text-black" : "bg-gray-800"
             }`}
             onClick={() => setActiveTab("add")}
           >
@@ -515,7 +513,7 @@ export default function SongManagment() {
           </button>
           <button
             className={`px-6 py-3 rounded-lg transition-all ${
-              activeTab === "edit" ? "bg-green-500" : "bg-gray-800"
+              activeTab === "edit" ? "bg-green-500 text-black" : "bg-gray-800"
             }`}
             onClick={() => setActiveTab("edit")}
           >
@@ -523,7 +521,7 @@ export default function SongManagment() {
           </button>
           <button
             className={`px-6 py-3 rounded-lg transition-all ${
-              activeTab === "delete" ? "bg-green-500" : "bg-gray-800"
+              activeTab === "delete" ? "bg-green-500 text-black" : "bg-gray-800"
             }`}
             onClick={() => setActiveTab("delete")}
           >

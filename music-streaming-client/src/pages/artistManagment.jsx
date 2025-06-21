@@ -367,7 +367,7 @@ export default function ArtistManagment() {
         <div className="flex justify-center space-x-4 mb-8">
           <button
             className={`px-6 py-3 rounded-lg transition-all ml-4 ${
-              activeTab === "add" ? "bg-green-500" : "bg-gray-800"
+              activeTab === "add" ? "bg-green-500 text-black" : "bg-gray-800"
             }`}
             onClick={() => setActiveTab("add")}
           >
@@ -375,7 +375,7 @@ export default function ArtistManagment() {
           </button>
           <button
             className={`px-6 py-3 rounded-lg transition-all ${
-              activeTab === "edit" ? "bg-green-500" : "bg-gray-800"
+              activeTab === "edit" ? "bg-green-500 text-black" : "bg-gray-800"
             }`}
             onClick={() => setActiveTab("edit")}
           >
@@ -383,7 +383,7 @@ export default function ArtistManagment() {
           </button>
           <button
             className={`px-6 py-3 rounded-lg transition-all ${
-              activeTab === "delete" ? "bg-green-500" : "bg-gray-800"
+              activeTab === "delete" ? "bg-green-500 text-black" : "bg-gray-800"
             }`}
             onClick={() => setActiveTab("delete")}
           >

@@ -18,7 +18,7 @@ export default function UserManagment() {
     role: 'user'
   });
   const [errorMessage, setErrorMessage] = useState('');
-  const [activeTab, setActiveTab] = useState('create'); // 'create', 'edit', 'delete'
+  const [activeTab, setActiveTab] = useState('create');
   const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
@@ -119,15 +119,13 @@ export default function UserManagment() {
   }
 
   const renderCreateUserForm = () => (
-    <div className="mb-6 bg-gray-800 p-6 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold mb-4 text-green-400">הוספת משתמש חדש</h2>
-      
+    <div className="mb-6">
+      <h2 className="text-2xl font-bold mb-4 text-green-400 text-center">הוספת משתמש חדש</h2>
       {errorMessage && (
         <div className="w-full bg-red-600 text-white px-4 py-3 rounded mb-6 text-center font-medium shadow-md">
           {errorMessage}
         </div>
       )}
-
       <form onSubmit={handleAddUser} className="space-y-4">
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
@@ -140,10 +138,9 @@ export default function UserManagment() {
             value={newUser.email}
             onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
             required
-            className="w-full p-3 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
+            className="w-full p-3 rounded bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
           />
         </div>
-
         <div>
           <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-2">
             שם משתמש
@@ -155,10 +152,9 @@ export default function UserManagment() {
             value={newUser.username}
             onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
             required
-            className="w-full p-3 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
+            className="w-full p-3 rounded bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
           />
         </div>
-
         <div>
           <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
             סיסמה
@@ -170,10 +166,9 @@ export default function UserManagment() {
             value={newUser.password}
             onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
             required
-            className="w-full p-3 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
+            className="w-full p-3 rounded bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
           />
         </div>
-
         <div>
           <label htmlFor="role" className="block text-sm font-medium text-gray-300 mb-2">
             תפקיד
@@ -203,10 +198,9 @@ export default function UserManagment() {
             </label>
           </div>
         </div>
-
         <button
           type="submit"
-          className="w-full py-3 bg-green-400 text-black font-bold rounded hover:bg-green-500 transition"
+          className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200"
         >
           הוסף משתמש
         </button>
@@ -215,8 +209,8 @@ export default function UserManagment() {
   );
 
   const renderEditUserForm = () => (
-    <div className="mb-6 bg-gray-800 p-6 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold mb-4 text-green-400">עריכת משתמש</h2>
+    <div className="mb-6">
+      <h2 className="text-2xl font-bold mb-4 text-green-400 text-center">עריכת משתמש</h2>
       <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="space-y-4">
         <div>
           <label htmlFor="edit-role" className="block text-sm font-medium text-gray-300 mb-2">
@@ -247,11 +241,10 @@ export default function UserManagment() {
             </label>
           </div>
         </div>
-
         <div className="flex gap-4">
           <button
             type="submit"
-            className="flex-1 py-3 bg-green-400 text-black font-bold rounded hover:bg-green-500 transition"
+            className="flex-1 py-3 bg-green-500 text-white font-bold rounded hover:bg-green-600 transition"
           >
             שמור שינויים
           </button>
@@ -268,12 +261,12 @@ export default function UserManagment() {
   );
 
   const renderEditUserTab = () => (
-    <div className="mb-6 bg-gray-800 p-6 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold mb-4 text-green-400">עריכת המשתמשים</h2>
+    <div className="mb-6">
+      <h2 className="text-2xl font-bold mb-4 text-green-400 text-center">עריכת המשתמשים</h2>
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-300 mb-2">בחר משתמש לעריכה</label>
         <select
-          className="w-full p-3 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
+          className="w-full p-3 rounded bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
           value={selectedUser?.id || ''}
           onChange={e => {
             const user = users.find(u => u.id === e.target.value);
@@ -297,7 +290,7 @@ export default function UserManagment() {
 
   const renderUsersList = () => (
     <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold mb-4 text-green-400">כל המשתמשים</h2>
+      <h2 className="text-2xl font-bold mb-4 text-green-400 text-center">כל המשתמשים</h2>
       <div className="overflow-x-auto">
         <table className="w-full border text-right">
           <thead>
@@ -322,88 +315,76 @@ export default function UserManagment() {
   );
 
   const renderUsersDelete = () => (
-    <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold mb-4 text-green-400">מחיקת משתמשים</h2>
-      <div className="overflow-x-auto">
-        <table className="w-full border text-right">
-          <thead>
-            <tr className="bg-gray-700 text-gray-200">
-              <th className="p-2">שם משתמש</th>
-              <th className="p-2">אימייל</th>
-              <th className="p-2">תפקיד</th>
-              <th className="p-2">פעולות</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map(user => (
-              <tr key={user.id} className="border-t border-gray-600 hover:bg-gray-700">
-                <td className="p-2">{user.name}</td>
-                <td className="p-2">{user.email}</td>
-                <td className="p-2">{user.role}</td>
-                <td className="p-2">
-                  <button
-                    onClick={() => handleDelete(user.id)}
-                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition"
-                  >
-                    מחק
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <div className="mt-8">
+      <div className="space-y-4">
+        {users.map(user => (
+          <div
+            key={user.id}
+            className="flex items-center justify-between p-2 bg-gray-800 rounded-lg"
+          >
+            <div>
+              <h3 className="text-lg font-medium text-white">{user.name}</h3>
+              <p className="text-gray-400">{user.email}</p>
+              <span className="text-sm text-gray-400">{user.role}</span>
+            </div>
+            <button
+              onClick={() => handleDelete(user.id)}
+              className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+            >
+              מחק
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   );
 
   return (
-    <div className="p-4 max-w-6xl mx-auto text-white mb-10" dir="rtl">
-      <h1 className="text-2xl font-bold mb-6 text-green-400 text-center">ניהול משתמשים</h1>
+    <div className="min-h-screen bg-black text-white px-4 py-8" dir="rtl">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-green-400 mb-2">ניהול משתמשים</h1>
+        </div>
 
-      {/* טאבים */}
-      <div className="flex justify-center mb-6">
-        <div className="inline-flex rounded-lg border border-gray-700 p-1 bg-gray-800">
+        {/* טאבים */}
+        <div className="flex justify-center space-x-4 mb-8">
           <button
             onClick={() => setActiveTab('create')}
-            className={`px-4 py-2 rounded-md ${
-              activeTab === 'create'
-                ? 'bg-green-500 text-black'
-                : 'text-gray-300 hover:bg-gray-700'
+            className={`px-6 py-3 rounded-lg transition-all ml-4 ${
+              activeTab === 'create' ? 'bg-green-500 text-black' : 'bg-gray-800 text-white-300'
             }`}
           >
             יצירת משתמש
           </button>
           <button
             onClick={() => setActiveTab('edit')}
-            className={`px-4 py-2 rounded-md ${
-              activeTab === 'edit'
-                ? 'bg-green-500 text-black'
-                : 'text-gray-300 hover:bg-gray-700'
+            className={`px-6 py-3 rounded-lg transition-all ml-4 ${
+              activeTab === 'edit' ? 'bg-green-500 text-black' : 'bg-gray-800 text-white-300'
             }`}
           >
             עריכת משתמשים
           </button>
           <button
             onClick={() => setActiveTab('delete')}
-            className={`px-4 py-2 rounded-md ${
-              activeTab === 'delete'
-                ? 'bg-green-500 text-black'
-                : 'text-gray-300 hover:bg-gray-700'
+            className={`px-6 py-3 rounded-lg transition-all ${
+              activeTab === 'delete' ? 'bg-green-500 text-black' : 'bg-gray-800 text-white-300'
             }`}
           >
             מחיקת משתמשים
           </button>
         </div>
-      </div>
 
-      {/* תוכן לפי טאב נבחר */}
-      {activeTab === 'create' && renderCreateUserForm()}
-      {activeTab === 'edit' && renderEditUserTab()}
-      {activeTab === 'delete' && renderUsersDelete()}
+        {/* תוכן לפי טאב נבחר */}
+        <div className="bg-gray-900 rounded-xl shadow-xl p-8 max-w-2xl mx-auto">
+          {activeTab === 'create' && renderCreateUserForm()}
+          {activeTab === 'edit' && renderEditUserTab()}
+          {activeTab === 'delete' && renderUsersDelete()}
+        </div>
 
-      {/* רשימת משתמשים תמיד מוצגת בתחתית */}
-      <div className="mt-8">
-        {renderUsersList()}
+        {/* רשימת משתמשים תמיד מוצגת בתחתית */}
+        <div className="mt-8">
+          {renderUsersList()}
+        </div>
       </div>
     </div>
   );
