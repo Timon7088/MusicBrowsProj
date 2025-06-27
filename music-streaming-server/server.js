@@ -3,13 +3,11 @@ import cors from "cors";
 import mongoose from "mongoose";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./Auth.js";
-<<<<<<< HEAD
-=======
-import path from "path";
-import { fileURLToPath } from "url";
->>>>>>> MusicBrows2.0WithAdmin
 import songRoutes from "./routes/songRoutes.js";
 import artistRoutes from "./routes/artistRoutes.js";
+import path from "path";
+import { fileURLToPath } from "url";
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -32,7 +30,7 @@ mongoose.connect("mongodb://localhost:27017/musicbrows", {
   console.error("MongoDB connection error:", err);
 });
 
-// ניתוב נכון לאימות משתמשים
+// מכל הנסיונות הניתוב הכי נכון splat
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
 app.use(express.json());

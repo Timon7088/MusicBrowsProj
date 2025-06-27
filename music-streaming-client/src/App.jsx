@@ -14,6 +14,9 @@ import SongManagment from "./pages/songManagment";
 import ArtistManagment from "./pages/artistManagment";
 import UserManagment from "./pages/userManagment";
 import AdminDashboard from "./components/adminDashboard";
+import axios from "axios";
+
+axios.defaults.withCredentials = true;
 
 export default function App() {
   return (
@@ -33,8 +36,14 @@ export default function App() {
               <Route path="/userProfile" element={<UserProfile />} />
               <Route path="/artist/:id" element={<ArtistPage />} />
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
-              <Route path="/admin/songs-management" element={<SongManagment />} />
-              <Route path="/admin/artists-management" element={<ArtistManagment />} />
+              <Route
+                path="/admin/songs-management"
+                element={<SongManagment />}
+              />
+              <Route
+                path="/admin/artists-management"
+                element={<ArtistManagment />}
+              />
               <Route path="/auth/admin/users" element={<UserManagment />} />
             </Routes>
           </main>

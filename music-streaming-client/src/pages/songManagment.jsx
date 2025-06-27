@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import Select from "react-select";
+import { useNavigate } from "react-router";
 import axios from "axios";
 import { authClient } from "../clients/auth-client";
 import toast from "react-hot-toast";
 
 export default function SongManagment() {
   const SERVER_URL = "http://localhost:4000";
-  const { data } = authClient.useSession();
+  const { data, isLoading } = authClient.useSession();
   const user = data?.user;
+  const navigate = useNavigate();
   const [artists, setArtists] = useState([]);
   const [songs, setSongs] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -15,6 +17,12 @@ export default function SongManagment() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [activeTab, setActiveTab] = useState("add");
   const [selectedSong, setSelectedSong] = useState(null);
+
+  useEffect(() => {
+    if (!isLoading && user?.role !== "admin") {
+      navigate("/");
+    }
+  }, [user, isLoading]);
 
   // GET Requests
   const fetchArtists = async () => {
@@ -57,7 +65,7 @@ export default function SongManagment() {
       );
       toast.success("השיר נוסף בהצלחה!");
       setSongs([...songs, response.data]);
-      e.target.reset(); // Reset form
+      e.target.reset();
     } catch (error) {
       console.error("Error adding song:", error);
       toast.error(error.response?.data?.message || "שגיאה בהוספת השיר");

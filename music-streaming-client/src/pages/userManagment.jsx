@@ -1,35 +1,38 @@
-import { useEffect, useState } from 'react';
-import { authClient } from '../clients/auth-client';
-import { useNavigate } from 'react-router';
-import toast from 'react-hot-toast';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
+import { authClient } from "../clients/auth-client";
+import toast from "react-hot-toast";
 
 export default function UserManagment() {
   const { data, isLoading } = authClient.useSession();
   const user = data?.user;
   const navigate = useNavigate();
-
   const [users, setUsers] = useState([]);
   const [editId, setEditId] = useState(null);
-  const [form, setForm] = useState({role: '' });
+  const [form, setForm] = useState({ role: "" });
   const [newUser, setNewUser] = useState({
-    email: '',
-    username: '',
-    password: '',
-    role: 'user'
+    email: "",
+    username: "",
+    password: "",
+    role: "user",
   });
-  const [errorMessage, setErrorMessage] = useState('');
-  const [activeTab, setActiveTab] = useState('create');
+  const [errorMessage, setErrorMessage] = useState("");
+  const [activeTab, setActiveTab] = useState("create");
   const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
-    if (user?.role === 'admin') {
+    if (!isLoading && user?.role !== "admin") {
+      navigate("/");
+    }
+    if (user?.role === "admin") {
       console.log("Attempting to fetch users...");
-      authClient.admin.listUsers({ query: { limit: 100 } })
-        .then(res => {
+      authClient.admin
+        .listUsers({ query: { limit: 100 } })
+        .then((res) => {
           console.log("Users fetched successfully:", res);
           setUsers(res.data.users);
         })
-        .catch(err => {
+        .catch((err) => {
           console.error("Error fetching users:", err);
           toast.error("שגיאה בטעינת משתמשים: " + err.message);
         });
@@ -42,12 +45,12 @@ export default function UserManagment() {
     if (window.confirm("האם אתה בטוח שברצונך למחוק משתמש זה?")) {
       try {
         await authClient.admin.removeUser({ userId: id });
-        setUsers(users.filter(u => u.id !== id));
+        setUsers(users.filter((u) => u.id !== id));
         toast.success("המשתמש נמחק בהצלחה!");
         console.log(users);
       } catch (err) {
         console.error("Error deleting user:", err);
-        toast.error('שגיאה במחיקת המשתמש: ' + err.message);
+        toast.error("שגיאה במחיקת המשתמש: " + err.message);
       }
     }
   };
@@ -55,46 +58,46 @@ export default function UserManagment() {
   const handleEdit = (user) => {
     setEditId(user.id);
     setForm({
-      email: user.email || '',
-      name: user.name || '',
-      role: user.role || 'user'
+      email: user.email || "",
+      name: user.name || "",
+      role: user.role || "user",
     });
-    setActiveTab('edit');
+    setActiveTab("edit");
   };
 
   const handleSave = async () => {
     try {
       await authClient.admin.setRole({
         userId: selectedUser.id,
-        role: form.role, 
+        role: form.role,
       });
       setEditId(null);
-      setUsers(users.map(u => (u.id === editId ? { ...u, ...form } : u)));
+      setUsers(users.map((u) => (u.id === editId ? { ...u, ...form } : u)));
       toast.success("המשתמש עודכן בהצלחה!");
-      setActiveTab('create');
+      setActiveTab("create");
     } catch (err) {
       console.error("Error updating user:", err);
-      toast.error('שגיאה בעדכון המשתמש: ' + err.message);
+      toast.error("שגיאה בעדכון המשתמש: " + err.message);
     }
   };
 
   const handleAddUser = async (e) => {
     e.preventDefault();
-    setErrorMessage('');
+    setErrorMessage("");
 
     try {
       const res = await authClient.admin.createUser({
         email: newUser.email,
         name: newUser.username,
         password: newUser.password,
-        role: newUser.role
+        role: newUser.role,
       });
 
       if (res?.error) throw res.error;
 
       if (res?.data?.user) {
         setUsers([...users, res.data.user]);
-        setNewUser({ email: '', username: '', password: '', role: 'user' });
+        setNewUser({ email: "", username: "", password: "", role: "user" });
         toast.success("המשתמש נוסף בהצלחה!");
       } else {
         setErrorMessage("הוספת המשתמש נכשלה - נסה שוב.");
@@ -110,7 +113,7 @@ export default function UserManagment() {
 
   if (isLoading) return <p>טוען...</p>;
 
-  if (!user || user.role !== 'admin') {
+  if (!user || user.role !== "admin") {
     return (
       <div className="p-4 text-center text-red-600 font-bold text-xl">
         אין לך הרשאה לגשת לדף זה.
@@ -120,7 +123,9 @@ export default function UserManagment() {
 
   const renderCreateUserForm = () => (
     <div className="mb-6">
-      <h2 className="text-2xl font-bold mb-4 text-green-400 text-center">הוספת משתמש חדש</h2>
+      <h2 className="text-2xl font-bold mb-4 text-green-400 text-center">
+        הוספת משתמש חדש
+      </h2>
       {errorMessage && (
         <div className="w-full bg-red-600 text-white px-4 py-3 rounded mb-6 text-center font-medium shadow-md">
           {errorMessage}
@@ -128,7 +133,10 @@ export default function UserManagment() {
       )}
       <form onSubmit={handleAddUser} className="space-y-4">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-300 mb-2"
+          >
             אימייל
           </label>
           <input
@@ -142,7 +150,10 @@ export default function UserManagment() {
           />
         </div>
         <div>
-          <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-2">
+          <label
+            htmlFor="username"
+            className="block text-sm font-medium text-gray-300 mb-2"
+          >
             שם משתמש
           </label>
           <input
@@ -150,13 +161,18 @@ export default function UserManagment() {
             id="username"
             placeholder="שם משתמש"
             value={newUser.username}
-            onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
+            onChange={(e) =>
+              setNewUser({ ...newUser, username: e.target.value })
+            }
             required
             className="w-full p-3 rounded bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
           />
         </div>
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-gray-300 mb-2"
+          >
             סיסמה
           </label>
           <input
@@ -164,13 +180,18 @@ export default function UserManagment() {
             id="password"
             placeholder="סיסמה"
             value={newUser.password}
-            onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+            onChange={(e) =>
+              setNewUser({ ...newUser, password: e.target.value })
+            }
             required
             className="w-full p-3 rounded bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
           />
         </div>
         <div>
-          <label htmlFor="role" className="block text-sm font-medium text-gray-300 mb-2">
+          <label
+            htmlFor="role"
+            className="block text-sm font-medium text-gray-300 mb-2"
+          >
             תפקיד
           </label>
           <div className="flex gap-4">
@@ -179,8 +200,10 @@ export default function UserManagment() {
                 type="radio"
                 name="role"
                 value="user"
-                checked={newUser.role === 'user'}
-                onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
+                checked={newUser.role === "user"}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, role: e.target.value })
+                }
                 className="w-4 h-4 text-green-400 bg-gray-700 border-gray-600 focus:ring-green-400"
               />
               <span className="text-gray-300">משתמש</span>
@@ -190,8 +213,10 @@ export default function UserManagment() {
                 type="radio"
                 name="role"
                 value="admin"
-                checked={newUser.role === 'admin'}
-                onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
+                checked={newUser.role === "admin"}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, role: e.target.value })
+                }
                 className="w-4 h-4 text-green-400 bg-gray-700 border-gray-600 focus:ring-green-400"
               />
               <span className="text-gray-300">מנהל</span>
@@ -210,10 +235,21 @@ export default function UserManagment() {
 
   const renderEditUserForm = () => (
     <div className="mb-6">
-      <h2 className="text-2xl font-bold mb-4 text-green-400 text-center">עריכת משתמש</h2>
-      <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="space-y-4">
+      <h2 className="text-2xl font-bold mb-4 text-green-400 text-center">
+        עריכת משתמש
+      </h2>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSave();
+        }}
+        className="space-y-4"
+      >
         <div>
-          <label htmlFor="edit-role" className="block text-sm font-medium text-gray-300 mb-2">
+          <label
+            htmlFor="edit-role"
+            className="block text-sm font-medium text-gray-300 mb-2"
+          >
             תפקיד
           </label>
           <div className="flex gap-4">
@@ -222,8 +258,8 @@ export default function UserManagment() {
                 type="radio"
                 name="edit-role"
                 value="user"
-                checked={form.role === 'user'}
-                onChange={e => setForm({ ...form, role: e.target.value })}
+                checked={form.role === "user"}
+                onChange={(e) => setForm({ ...form, role: e.target.value })}
                 className="w-4 h-4 text-green-400 bg-gray-700 border-gray-600 focus:ring-green-400"
               />
               <span className="text-gray-300">משתמש</span>
@@ -233,8 +269,8 @@ export default function UserManagment() {
                 type="radio"
                 name="edit-role"
                 value="admin"
-                checked={form.role === 'admin'}
-                onChange={e => setForm({ ...form, role: e.target.value })}
+                checked={form.role === "admin"}
+                onChange={(e) => setForm({ ...form, role: e.target.value })}
                 className="w-4 h-4 text-green-400 bg-gray-700 border-gray-600 focus:ring-green-400"
               />
               <span className="text-gray-300">מנהל</span>
@@ -262,25 +298,31 @@ export default function UserManagment() {
 
   const renderEditUserTab = () => (
     <div className="mb-6">
-      <h2 className="text-2xl font-bold mb-4 text-green-400 text-center">עריכת המשתמשים</h2>
+      <h2 className="text-2xl font-bold mb-4 text-green-400 text-center">
+        עריכת המשתמשים
+      </h2>
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-300 mb-2">בחר משתמש לעריכה</label>
+        <label className="block text-sm font-medium text-gray-300 mb-2">
+          בחר משתמש לעריכה
+        </label>
         <select
           className="w-full p-3 rounded bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
-          value={selectedUser?.id || ''}
-          onChange={e => {
-            const user = users.find(u => u.id === e.target.value);
+          value={selectedUser?.id || ""}
+          onChange={(e) => {
+            const user = users.find((u) => u.id === e.target.value);
             setSelectedUser(user);
             setForm({
-              email: user?.email || '',
-              name: user?.name || '',
-              role: user?.role || 'user'
+              email: user?.email || "",
+              name: user?.name || "",
+              role: user?.role || "user",
             });
           }}
         >
           <option value="">בחר משתמש...</option>
-          {users.map(u => (
-            <option key={u.id} value={u.id}>{u.name} ({u.email})</option>
+          {users.map((u) => (
+            <option key={u.id} value={u.id}>
+              {u.name} ({u.email})
+            </option>
           ))}
         </select>
       </div>
@@ -290,7 +332,9 @@ export default function UserManagment() {
 
   const renderUsersList = () => (
     <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold mb-4 text-green-400 text-center">כל המשתמשים</h2>
+      <h2 className="text-2xl font-bold mb-4 text-green-400 text-center">
+        כל המשתמשים
+      </h2>
       <div className="overflow-x-auto">
         <table className="w-full border text-right">
           <thead>
@@ -301,8 +345,11 @@ export default function UserManagment() {
             </tr>
           </thead>
           <tbody>
-            {users.map(user => (
-              <tr key={user.id} className="border-t border-gray-600 hover:bg-gray-700">
+            {users.map((user) => (
+              <tr
+                key={user.id}
+                className="border-t border-gray-600 hover:bg-gray-700"
+              >
                 <td className="p-2">{user.name}</td>
                 <td className="p-2">{user.email}</td>
                 <td className="p-2">{user.role}</td>
@@ -317,7 +364,7 @@ export default function UserManagment() {
   const renderUsersDelete = () => (
     <div className="mt-8">
       <div className="space-y-4">
-        {users.map(user => (
+        {users.map((user) => (
           <div
             key={user.id}
             className="flex items-center justify-between p-2 bg-gray-800 rounded-lg"
@@ -343,31 +390,39 @@ export default function UserManagment() {
     <div className="min-h-screen bg-black text-white px-4 py-8" dir="rtl">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-green-400 mb-2">ניהול משתמשים</h1>
+          <h1 className="text-4xl font-bold text-green-400 mb-2">
+            ניהול משתמשים
+          </h1>
         </div>
 
         {/* טאבים */}
         <div className="flex justify-center space-x-4 mb-8">
           <button
-            onClick={() => setActiveTab('create')}
+            onClick={() => setActiveTab("create")}
             className={`px-6 py-3 rounded-lg transition-all ml-4 ${
-              activeTab === 'create' ? 'bg-green-500 text-black' : 'bg-gray-800 text-white-300'
+              activeTab === "create"
+                ? "bg-green-500 text-black"
+                : "bg-gray-800 text-white-300"
             }`}
           >
             יצירת משתמש
           </button>
           <button
-            onClick={() => setActiveTab('edit')}
+            onClick={() => setActiveTab("edit")}
             className={`px-6 py-3 rounded-lg transition-all ml-4 ${
-              activeTab === 'edit' ? 'bg-green-500 text-black' : 'bg-gray-800 text-white-300'
+              activeTab === "edit"
+                ? "bg-green-500 text-black"
+                : "bg-gray-800 text-white-300"
             }`}
           >
             עריכת משתמשים
           </button>
           <button
-            onClick={() => setActiveTab('delete')}
+            onClick={() => setActiveTab("delete")}
             className={`px-6 py-3 rounded-lg transition-all ${
-              activeTab === 'delete' ? 'bg-green-500 text-black' : 'bg-gray-800 text-white-300'
+              activeTab === "delete"
+                ? "bg-green-500 text-black"
+                : "bg-gray-800 text-white-300"
             }`}
           >
             מחיקת משתמשים
@@ -376,15 +431,13 @@ export default function UserManagment() {
 
         {/* תוכן לפי טאב נבחר */}
         <div className="bg-gray-900 rounded-xl shadow-xl p-8 max-w-2xl mx-auto">
-          {activeTab === 'create' && renderCreateUserForm()}
-          {activeTab === 'edit' && renderEditUserTab()}
-          {activeTab === 'delete' && renderUsersDelete()}
+          {activeTab === "create" && renderCreateUserForm()}
+          {activeTab === "edit" && renderEditUserTab()}
+          {activeTab === "delete" && renderUsersDelete()}
         </div>
 
         {/* רשימת משתמשים תמיד מוצגת בתחתית */}
-        <div className="mt-8">
-          {renderUsersList()}
-        </div>
+        <div className="mt-8">{renderUsersList()}</div>
       </div>
     </div>
   );

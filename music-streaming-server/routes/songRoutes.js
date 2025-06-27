@@ -14,6 +14,8 @@ import { parseBuffer } from 'music-metadata';
 import Artist from '../models/artist.js';
 import { MongoClient } from 'mongodb';
 import mongoose from 'mongoose';
+import { fromNodeHeaders } from "better-auth/node";
+import { auth } from '../Auth.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -53,6 +55,15 @@ router.post(
   ]),
   async (req, res) => {
     try {
+      const session = await auth.api.getSession({
+        headers: fromNodeHeaders(req.headers),
+      });
+      if (!session) {
+        return res.status(401).json({ message: "there is no session" });
+      }
+      if (session.user.role !== "admin") {
+        return res.status(401).json({ message: "Only Admin can access this page" });
+      }
       const songsDir = path.join(__dirname, '../public/songs');
       const imagesDir = path.join(__dirname, '../public/images');
       if (!fs.existsSync(songsDir)) fs.mkdirSync(songsDir, { recursive: true });
@@ -127,6 +138,15 @@ router.put("/:id", upload.fields([
   { name: 'cover', maxCount: 1 }
 ]), async (req, res) => {
   try {
+    const session = await auth.api.getSession({
+      headers: fromNodeHeaders(req.headers),
+    });
+    if (!session) {
+      return res.status(401).json({ message: "there is no session" });
+    }
+    if (session.user.role !== "admin") {
+      return res.status(401).json({ message: "Only Admin can access this page" });
+    }
     const song = await getSongById(req.params.id);
     if (!song) {
       return res.status(404).json({ message: "השיר לא נמצא" });
@@ -198,6 +218,15 @@ router.put("/:id", upload.fields([
 // DELETE - כולל הסרה מהאמן וממשתמשים
 router.delete('/:id', async (req, res) => {
   try {
+    const session = await auth.api.getSession({
+      headers: fromNodeHeaders(req.headers),
+    });
+    if (!session) {
+      return res.status(401).json({ message: "there is no session" });
+    }
+    if (session.user.role !== "admin") {
+      return res.status(401).json({ message: "Only Admin can access this page" });
+    }
     const song = await getSongById(req.params.id);
     if (!song) {
       return res.status(404).json({ message: 'השיר לא נמצא' });

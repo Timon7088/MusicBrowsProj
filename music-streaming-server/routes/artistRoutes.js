@@ -5,6 +5,8 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
+import { fromNodeHeaders } from "better-auth/node";
+import { auth } from '../Auth.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,6 +36,15 @@ router.get("/:id", async (req, res) => {
 
 router.post("/", upload.single('image'), async (req, res) => {
   try{
+    const session = await auth.api.getSession({
+      headers: fromNodeHeaders(req.headers),
+    });
+    if (!session) {
+      return res.status(401).json({ message: "there is no session" });
+    }
+    if (session.user.role !== "admin") {
+      return res.status(401).json({ message: "Only Admin can access this page" });
+    }
     const imagesDir = path.join(__dirname, '../public/images');
     if(!fs.existsSync(imagesDir)) 
       fs.mkdirSync(imagesDir, { recursive: true });
@@ -60,6 +71,15 @@ router.post("/", upload.single('image'), async (req, res) => {
 
 router.put("/:id",upload.single('image'), async (req, res) => {
   try{
+    const session = await auth.api.getSession({
+      headers: fromNodeHeaders(req.headers),
+    });
+    if (!session) {
+      return res.status(401).json({ message: "there is no session" });
+    }
+    if (session.user.role !== "admin") {
+      return res.status(401).json({ message: "Only Admin can access this page" });
+    }
     const artist = await getArtistById(req.params.id);
     if(!artist) 
       return res.status(404).json({ message: 'אמן לא נמצא' });
@@ -90,6 +110,15 @@ router.put("/:id",upload.single('image'), async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   try {
+    const session = await auth.api.getSession({
+      headers: fromNodeHeaders(req.headers),
+    });
+    if (!session) {
+      return res.status(401).json({ message: "there is no session" });
+    }
+    if (session.user.role !== "admin") {
+      return res.status(401).json({ message: "Only Admin can access this page" });
+    }
     const artist = await getArtistById(req.params.id);
     if (!artist) {
       return res.status(404).json({ message: "האמן לא נמצא" });
